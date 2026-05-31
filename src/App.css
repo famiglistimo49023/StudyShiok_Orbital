@@ -181,3 +181,41 @@
     border-right-color: var(--border);
   }
 }
+
+.page {
+  padding: 20px;
+}
+
+/* navbar */
+.navbar {
+  display: flex;
+  gap: 20px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* search bar */
+.searchBar {
+  margin: 20px 0;
+}
+
+.searchBar input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+}
+
+/* grid layout */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* card */
+.card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}

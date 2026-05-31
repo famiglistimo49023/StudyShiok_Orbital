@@ -1,30 +1,21 @@
 import { useState } from 'react'
-
-import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
-import logo from './assets/logo.png'
-import './App.css'
-
-function Login() {
+function Register() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
+  const navigate = useNavigate() //can change pages without reloading
 
-  const navigate = useNavigate()
-
-  const handleLogin = () => {
-    console.log(username, password)
-    navigate('/explore') 
+  const handleRegister = () => {
+    console.log('Register:', username, password)
+    navigate('/explore')
   }
 
   return (
     <div className="loginPage">
       <div className="loginCard">
-        <img src={logo} className="logo" alt="logo" />
-
-        <h2>Welcome!</h2>
-        <p>Login to your account</p>
+        <h2>Create Account</h2>
 
         <input
           className="inputField"
@@ -41,17 +32,14 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {/* username password fields, add validation checks later */}
 
-        <button className="loginButton" onClick={handleLogin}>
-          Login
-        </button>
-
-        <Link to="/register" className="registerLink">
-          New Here? Register Now!
-        </Link>
+        <button className="loginButton" onClick={handleRegister}>
+          Register
+        </button> {/* register button, add API call later */}
       </div>
     </div>
   )
 }
 
-export default Login
+export default Register
