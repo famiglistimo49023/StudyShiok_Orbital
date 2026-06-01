@@ -69,7 +69,7 @@ function Explore() {
             <h3>{spot.name}</h3>
             <p>{spot.campusArea}</p>
             <div className="cardInfoRow">
-                <span><b>Rating:</b> {spot.rating} ⭐</span>
+                <span><b>Rating:</b> {spot.rating} / 5</span>
                 <span><b>{spot.busyness}</b></span>
             </div>
           </div>

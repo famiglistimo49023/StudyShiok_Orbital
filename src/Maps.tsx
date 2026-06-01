@@ -1,9 +1,8 @@
-import { useState } from 'react'
+
 import { Link, useNavigate } from 'react-router-dom'
 
 const Maps: React.FC = () => {
   const navigate = useNavigate()
-  const [search, setSearch] = useState('')
 
   return (
     <div className="page">

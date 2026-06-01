@@ -1,19 +1,19 @@
-import { useState } from 'react'
+
 import { Link, useNavigate } from 'react-router-dom'
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate()
-  const [search, setSearch] = useState('')
 
-  // dummy stats (later from backend)
+
+  //hardcoded for now
   const stats = {
-    bookmarkedCount: 3,
-    ratingsGiven: 12,
-    avgRating: 4.3,
-    notBusySpots: 5
+    bookmarkedCount: 1,
+    ratingsGiven: 4,
+    avgRating: 4.5,
+    notBusySpots: 2
   }
 
-  // dummy bookmarked spot (reuse existing structure)
+  //hardcoded for now
   const bookmarkedSpots = [
     { id: 1, name: 'ERC Level 2', campusArea: 'UTown', rating: 4.6, busyness: 'Moderately Busy' }
   ]
@@ -21,7 +21,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="page">
 
-      {/* NAVBAR */}
+      {/* navbar */}
       <div className="navbar">
         <div className="navbarLinks">
           <Link to="/explore">Explore</Link>
@@ -38,10 +38,10 @@ const Dashboard: React.FC = () => {
         </button>
       </div>
 
-      {/* TITLE */}
+
       <h1 className="pageTitle">Dashboard</h1>
 
-      {/* STATS ROW */}
+
       <div className="statsGrid">
 
         <div className="statCard">
@@ -66,7 +66,8 @@ const Dashboard: React.FC = () => {
 
       </div>
 
-      {/* BOOKMARKED SECTION */}
+
+
       <h2 className="sectionTitle">Your Bookmarked Spots</h2>
 
       <div className="cardGrid">
@@ -75,7 +76,7 @@ const Dashboard: React.FC = () => {
             <h3>{spot.name}</h3>
             <p>{spot.campusArea}</p>
             <div className="cardInfoRow">
-                <span><b>Rating:</b> {spot.rating} ⭐</span>
+                <span><b>Rating:</b> {spot.rating} / 5</span>
                 <span><b>{spot.busyness}</b></span>
             </div>
           </div>
