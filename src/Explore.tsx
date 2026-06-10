@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { supabase } from './supabase'
+
 type StudySpot = {
   id: number
   name: string
@@ -28,6 +30,20 @@ function Explore() {
     spot.name.toLowerCase().includes(search.toLowerCase())
   ) //search filter, no need to press enter to search
 
+  const [username, setUsername] = useState("")
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser()
+
+      if (data.user) {
+        setUsername(data.user.user_metadata.username)
+      }
+    }
+
+    fetchUser()
+  }, [])
+
   return (
     <div className="page">
 
@@ -49,7 +65,7 @@ function Explore() {
         </button>
       </div>
 
-      <h1 className="pageTitle">Explore</h1>
+      <h1 className="pageTitle">Welcome, {username}!</h1>
 
       <div className="searchBar">
         <input
