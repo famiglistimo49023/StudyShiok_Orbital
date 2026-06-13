@@ -6,7 +6,7 @@ import { supabase } from './supabase'
 type StudySpot = {
   id: number
   name: string
-  campusArea: string
+  location: string
   rating: number
   busyness: string
 }
@@ -18,12 +18,19 @@ function Explore() {
     const navigate = useNavigate()
 
   useEffect(() => {
-    //hardcoded for now
-    setSpots([
-      { id: 1, name: 'ERC Level 2', campusArea: 'UTown', rating: 4.6, busyness: 'Moderately Busy' },
-      { id: 2, name: 'Benches outside Central Library', campusArea: 'CLB', rating: 4.4, busyness: 'Free' },
-      { id: 3, name: 'Benches beside Frontier', campusArea: 'Science', rating: 4.2, busyness: 'Busy' }
-    ])
+    const fetchSpots = async () => {
+      const { data, error } = await supabase
+        .from('studyspots')
+        .select('*')
+
+      if (error) {
+        console.error('Error fetching spots:', error)
+      } else {
+        setSpots(data)
+      }
+    }
+
+    fetchSpots()
   }, [])
 
   const filteredSpots = spots.filter((spot) =>
@@ -83,7 +90,7 @@ function Explore() {
         {filteredSpots.map((spot) => (
           <div key={spot.id} className="card">
             <h3>{spot.name}</h3>
-            <p>{spot.campusArea}</p>
+            <p>{spot.location}</p>
             <div className="cardInfoRow">
                 <span><b>Rating:</b> {spot.rating} / 5</span>
                 <span><b>{spot.busyness}</b></span>
