@@ -9,24 +9,25 @@ type StudySpot = {
   location: string
   rating: number
   busyness: string
-}
+} //creates object of studyspot
 
 function Explore() {
-  const [spots, setSpots] = useState<StudySpot[]>([])
+  const [spots, setSpots] = useState<StudySpot[]>([]) //initialstate should be ntg (??)
   const [search, setSearch] = useState('')
+  //without useState, component wont rerender after fetching data, so spots will be empty array and nothing will show up on explore page
 
-    const navigate = useNavigate()
+    const navigate = useNavigate() //the function that allows me to move between webpages
 
-  useEffect(() => {
+  useEffect(() => { //useEffect runs when the component appears first
     const fetchSpots = async () => {
       const { data, error } = await supabase
         .from('studyspots')
-        .select('*')
+        .select('*') //sql query
 
       if (error) {
-        console.error('Error fetching spots:', error)
+        console.error('Error fetching spots:', error) //might fail bc network error
       } else {
-        setSpots(data)
+        setSpots(data) //action to update state var
       }
     }
 
