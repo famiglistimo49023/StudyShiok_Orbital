@@ -20,7 +20,7 @@ function Register() {
       password: password,
       options: {
         data: {
-          username: username
+          display_name: username
         }
       }
     })
@@ -68,7 +68,7 @@ function Register() {
 
           <button className="loginButton" type="submit">
             Register
-          </button> {/* register button, need to add API calls later */}
+          </button> {/* register button, need to add API calls later, talk about switching from onClick {} issue */}
         </form>
       </div>
     </div>

@@ -41,15 +41,24 @@ function Explore() {
   const [username, setUsername] = useState("")
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await supabase.auth.getUser()
+    const fetchProfile = async () => {
+      const { data: authData } = await supabase.auth.getUser()
+      if (!authData.user) return
 
-      if (data.user) {
-        setUsername(data.user.user_metadata.username)
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', authData.user.id)
+        .single()
+
+      if (error) {
+        console.error('Error fetching profile:', error)
+      } else {
+        setUsername(data.display_name)
       }
     }
 
-    fetchUser()
+    fetchProfile()
   }, [])
 
   return (
