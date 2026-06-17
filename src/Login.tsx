@@ -4,7 +4,7 @@ import { supabase } from './supabase'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
-import logo from './assets/logo.png'
+import logo from './assets/logo_blank.png'
 import './App.css'
 
 function Login() {
@@ -30,18 +30,28 @@ function Login() {
   }
 
   return (
-    <div className="loginPage">
-      <div className="loginCard">
-        <img src={logo} className="logo" alt="logo" />
+    <div className="flex min-h-screen items-center justify-center bg-[#065088] px-6">
+      <div className="w-full max-w-sm rounded-lg bg-[#03233b] p-6 shadow-lg">
 
-        <h2>Welcome!</h2>
-        <p>Login to your account</p>
+        <img src={logo} className="mx-auto h-20 w-auto" alt="logo" />
 
-        {error && <p className="error">{error}</p>} 
+        <h2 className="mt-2 text-center text-2xl font-bold text-white">
+          Welcome!
+        </h2>
 
-        <div className="inputContainer">
+        <p className="text-center text-sm text-gray-400">
+          Log in to your account
+        </p>
+
+        {error && (
+          <p className="mt-4 text-sm text-red-400 text-center">
+            {error}
+          </p>
+        )}
+
+        <div className="mt-6 space-y-4">
           <input
-            className="inputField"
+            className="w-full rounded-md bg-white/5 px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             type="email"
             placeholder="Email"
             value={email}
@@ -49,7 +59,7 @@ function Login() {
           />
 
           <input
-            className="inputField"
+            className="w-full rounded-md bg-white/5 px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             type="password"
             placeholder="Password"
             value={password}
@@ -57,11 +67,17 @@ function Login() {
           />
         </div>
 
-        <button className="loginButton" onClick={handleLogin}>
+        <button
+          className="mt-6 w-full rounded-md bg-[#065088] py-2 font-semibold text-white hover:bg-[#2a6f97]"
+          onClick={handleLogin}
+        >
           Login
         </button>
 
-        <Link to="/register" className="registerButton">
+        <Link
+          to="/register"
+          className="mt-4 block text-center text-sm text-[#61a5c2] hover:text-[#a9d6e5]"
+        >
           New Here? Register Now!
         </Link>
       </div>

@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* most of these preset from react template, need to remove soon */
 .counter {
   font-size: 16px;
