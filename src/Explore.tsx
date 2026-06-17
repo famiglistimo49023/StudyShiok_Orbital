@@ -62,38 +62,100 @@ function Explore() {
   }, [])
 
   return (
-    <div className="page">
+    <div className="bg-[#2D4466] min-h-screen p-8 text-black">
 
-      <div className="navbar">
-        <div className="navbarLinks">
-          <Link to="/explore">Explore</Link>
-          <Link to="/maps">Maps</Link>
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/suggest">Suggest a Spot</Link>
+      <div className="flex items-center justify-between border-b border-gray-200 px-8 py-4">
+        <div className="flex gap-8 text-lg font-medium text-white">
+          <Link
+            to="/explore"
+            className="transition-colors hover:text-[#bfdbf7]"
+          >
+          Explore
+          </Link>
+
+          <Link
+            to="/maps"
+            className="transition-colors hover:text-[#bfdbf7]"
+          >
+            Maps
+          </Link>
+
+          <Link
+            to="/dashboard"
+            className="transition-colors hover:text-[#bfdbf7]"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            to="/suggest"
+            className="transition-colors hover:text-[#bfdbf7]"
+          >
+            Suggest a Spot
+          </Link>
         </div>
 
         
 
         <button
-            className="logoutButton"
-            onClick={() => navigate('/')}
+          className="rounded-lg bg-[#ff9e00] px-4 py-2 font-medium text-white transition hover:bg-[#ffb703]"
+          onClick={() => navigate('/')}
         >
-            Log Out
+          Log Out
         </button>
       </div>
 
-      <h1 className="pageTitle">Welcome, {username}!</h1>
+      <h1 className="mt-8 text-4xl font-bold tracking-tight text-[#ffb703]">
+        Welcome, {username}!
+      </h1>
 
-      <div className="searchBar">
-        <input
-          type="text"
-          placeholder="Search study spots..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <p className="mt-2 text-gray-200">
+        Study spots near you, for you.
+      </p>
+
+      <div className="mt-8 max-w-lg">
+        <div className="relative">
+          
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg
+              className="h-5 w-5 text-gray-400"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-4.35-4.35M16 10a6 6 0 11-12 0 6 6 0 0112 0z"
+              />
+            </svg>
+          </div>
+
+          <input
+            type="text"
+            placeholder="Search study spots..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-24 
+            shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg 
+            bg-[#ff9e00] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#ffb703]"
+          >
+            Search
+          </button>
+
+        </div>
       </div>
 
-      <h4><i>Pictures for each spot to be added soon!</i></h4>
+      <h4 className="text-gray-200">
+        <i>Pictures for each spot to be added soon!</i>
+      </h4>
 
       {/* bc i want card layout */}
       <div className="cardGrid">

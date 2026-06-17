@@ -30,12 +30,12 @@ function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#065088] px-6">
+    <div className="flex min-h-screen items-center justify-center bg-[#2D4466] px-6">
       <div className="w-full max-w-sm rounded-lg bg-[#03233b] p-6 shadow-lg">
 
         <img src={logo} className="mx-auto h-20 w-auto" alt="logo" />
 
-        <h2 className="mt-2 text-center text-2xl font-bold text-white">
+        <h2 className="mt-2 text-center text-2xl font-bold text-[#ff9e00]">
           Welcome!
         </h2>
 
@@ -76,7 +76,7 @@ function Login() {
 
         <Link
           to="/register"
-          className="mt-4 block text-center text-sm text-[#61a5c2] hover:text-[#a9d6e5]"
+          className="mt-4 block text-center text-sm text-[#ff9e00] hover:text-[#ffb703]"
         >
           New Here? Register Now!
         </Link>
