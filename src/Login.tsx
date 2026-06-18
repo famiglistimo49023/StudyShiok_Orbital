@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
 import logo from './assets/logo_blank.png'
+
 import './App.css'
 
 function Login() {
@@ -51,7 +52,7 @@ function Login() {
 
         <div className="mt-6 space-y-4">
           <input
-            className="w-full rounded-md bg-white/5 px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-md bg-white/5 px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#447cd1]"
             type="email"
             placeholder="Email"
             value={email}
@@ -59,7 +60,7 @@ function Login() {
           />
 
           <input
-            className="w-full rounded-md bg-white/5 px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-md bg-white/5 px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#447cd1]"
             type="password"
             placeholder="Password"
             value={password}

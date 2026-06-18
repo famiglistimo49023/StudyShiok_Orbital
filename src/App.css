@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* most of these preset from react template, need to remove soon */
+/* most of these preset from react template, need to remove soon
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -190,7 +190,7 @@
 }
 
 /* navbar */
-.navbar {
+/* .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -203,256 +203,15 @@
   gap: 16px;
 }
 
-/* searchbar */
-.searchBar {
-  margin: 20px 0;
-}
-
-.searchBar input {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-}
-
-/* grid layouts */
-.cardGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.card {
-  background: rgba(255, 255, 255, 0.644);
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(105, 133, 223, 0.685);
-}
-
-.logoutButton {
-  padding: 10px 18px;
-
-  background: white;
-  color: #1e41da;
-
-  border: 1px solid #1e41da;
-  border-radius: 8px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.logoutButton:hover {
-  background: #1e41da;
-  color: white;
-}
-
-/* page title */
-.pageTitle {
-  margin-top: 20px;
-}
-
-/* 4 stat cards in one row */
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-
-  margin-top: 20px;
-}
-
-/* individual stat card */
-.statCard {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-
-  text-align: center;
-}
-
-.statCard h3 {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
-}
-
-.statCard p {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
-}
-
-/* reuse your existing card grid */
-.cardGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-
-  margin-top: 10px;
-}
-
-/* study spot card */
-.card {
-  background: white;
-  padding: 16px;
-  border-radius: 12px;
-
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
-
-/* section title */
-.sectionTitle {
-  margin-top: 30px;
-}
-
-/* form container */
-.formCard {
-  max-width: 500px;
-  margin: 30px auto;
-
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
-
-/* inputs */
-
-.inputContainer {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.inputField {
-  width: 40%;
-  padding: 12px;
-  font-size: 15px;
-
-  border: 1px solid #ccc;
-  border-radius: 10px;
-
-  outline: none;
-  transition: 0.2s;
-}
-
-.inputField:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-}
-
-/* rating section */
-.ratingBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* stars */
-.stars {
-  display: flex;
-  gap: 5px;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.star {
-  color: #ccc;
-  transition: 0.2s;
-}
-
-.star.filled {
-  color: #fbbf24;
-}
-
-/* submit button */
-.submitButton {
-  padding: 10px 18px;
-
-  background: white;
-  color: #1e41da;
-
-  border: 1px solid #1e41da;
-  border-radius: 8px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.submitButton:hover {
-  background: #1e41da;
-  color: white;
-
-}
-
-/* login button */
-.loginButton {
-  width: 10%;
-  padding: 12px;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  background: #3b82f6;
-  color: white;
-
-  border: none;
-  border-radius: 10px;
-
-  cursor: pointer;
-  margin-top: 6px;
-
-  gap: 12px;
-}
-
-.loginButton:hover {
-  background: #2563eb;
-}
-
-.registerButton {
-  width: 100%;
-  padding: 12px;
-
-  text-align: center;
+.navbarLink {
   text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
 
-  font-size: 15px;
-  font-weight: 600;
-
-  background: #f3f4f6;
-  color: #4b5563;
-
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-
-  box-sizing: border-box;
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-.registerButton:hover {
-  background: #e5e7eb;
-}
-
-.cardInfoRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  margin-top: 10px;
-
-}
+  &:hover {
+    background-color: #f0f0f0;
+  }
+} */

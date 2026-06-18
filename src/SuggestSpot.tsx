@@ -53,23 +53,49 @@ const Suggest: React.FC = () => {
   }
 
   return (
-    <div className="page">
+    <div className="bg-[#2D4466] min-h-screen p-8 text-black">
 
-      <div className="navbar">
-        <div className="navbarLinks">
-          <Link to="/explore">Explore</Link>
-          <Link to="/maps">Maps</Link>
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/suggest">Suggest a Spot</Link>
+      <div className="flex items-center justify-between border-b border-gray-200 px-8 py-4">
+        <div className="flex gap-8 text-lg font-medium text-white">
+          <Link
+            to="/explore"
+            className="transition-colors hover:text-[#bfdbf7]"
+          >
+          Explore
+          </Link>
+
+          <Link
+            to="/maps"
+            className="transition-colors hover:text-[#bfdbf7]"
+          >
+            Maps
+          </Link>
+
+          <Link
+            to="/dashboard"
+            className="transition-colors hover:text-[#bfdbf7]"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            to="/suggest"
+            className="transition-colors hover:text-[#bfdbf7]"
+          >
+            Suggest a Spot
+          </Link>
         </div>
 
+        
+
         <button
-          className="logoutButton"
+          className="rounded-lg bg-[#ff9e00] px-4 py-2 font-medium text-white transition hover:bg-[#ffb703]"
           onClick={() => navigate('/')}
         >
           Log Out
         </button>
       </div>
+
 
       <h1>Suggest a Study Spot</h1>
 

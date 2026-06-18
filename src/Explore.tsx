@@ -158,14 +158,14 @@ function Explore() {
       </h4>
 
       {/* bc i want card layout */}
-      <div className="cardGrid">
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredSpots.map((spot) => (
-          <div key={spot.id} className="card">
-            <h3>{spot.name}</h3>
-            <p>{spot.location}</p>
-            <div className="cardInfoRow">
+          <div key={spot.id} className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg">
+            <h3 className="text-xl font-semibold text-gray-900">{spot.name}</h3>
+            <p className="text-gray-600">{spot.location}</p>
+            <div className="mt-4 flex items-center justify-between text-sm text-gray-700">
                 <span><b>Rating:</b> {spot.rating} / 5</span>
-                <span><b>{spot.busyness}</b></span>
+                <span className="rounded-full bg-blue-100 px-3 py-1 font-medium text-blue-800"><b>{spot.busyness}</b></span>
             </div>
           </div>
         ))}
