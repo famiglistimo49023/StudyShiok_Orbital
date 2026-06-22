@@ -50,8 +50,12 @@ const Maps: React.FC = () => {
 
 
       {/* PAGE CONTENT */}
-      <h2>google maps pro max</h2>
-      <p>Welcome to the Maps! Unfortunately, the maps feature is not yet implemented.</p>
+      <h1 className="mt-8 text-4xl font-bold tracking-tight text-[#ffb703]">
+        google maps pro max
+        </h1>
+      <p className="mt-2 text-gray-200">
+        Welcome to the Maps! Unfortunately, the maps feature is not yet implemented.
+        </p>
 
 
     </div>

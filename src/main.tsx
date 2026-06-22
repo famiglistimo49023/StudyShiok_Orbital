@@ -2,12 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import Login from './Login'
-import Register from './Register'
-import Explore from './Explore'
-import Dashboard from './Dashboard'
-import Maps from './Maps'
-import Suggest from './SuggestSpot'
+import Login from './components/Login'
+import Register from './components/Register'
+import Explore from './components/Explore'
+import Dashboard from './components/Dashboard'
+import Maps from './components/Maps'
+import Suggest from './components/SuggestSpot'
 
 
 createRoot(document.getElementById('root')!).render(

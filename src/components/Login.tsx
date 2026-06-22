@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { supabase } from './supabase'
+import { supabase } from '../supabase'
 
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
-import logo from './assets/logo_blank.png'
+import logo from '../assets/logo_blank.png'
 
-import './App.css'
+import '../App.css'
 
 function Login() {
   const [email, setEmail] = useState('') //easier to rerender component after error message
@@ -32,8 +32,8 @@ function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#2D4466] px-6">
-      <div className="w-full max-w-sm rounded-lg bg-[#03233b] p-6 shadow-lg">
-
+      <div className="w-full max-w-sm rounded-lg bg-[#03233b] p-6 ring-2 ring-[#ff9e00] shadow-lg shadow-[#ff9e00]/50">
+      
         <img src={logo} className="mx-auto h-20 w-auto" alt="logo" />
 
         <h2 className="mt-2 text-center text-2xl font-bold text-[#ff9e00]">
