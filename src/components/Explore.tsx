@@ -61,6 +61,8 @@ function Explore() {
     fetchProfile()
   }, [])
 
+  const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
+
   return (
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
 
@@ -160,7 +162,7 @@ function Explore() {
       {/* bc i want card layout */}
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredSpots.map((spot) => (
-          <div key={spot.id} className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg">
+          <div key={spot.id} className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg cursor pointer" onClick={() => setSelectedSpot(spot)}>
             <h3 className="text-xl font-semibold text-gray-900">{spot.name}</h3>
             <p className="text-gray-600">{spot.location}</p>
             <div className="mt-4 flex items-center justify-between text-sm text-gray-700">
@@ -170,6 +172,8 @@ function Explore() {
           </div>
         ))}
       </div>
+
+      
     </div>
   )
 }
