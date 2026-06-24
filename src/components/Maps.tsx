@@ -49,9 +49,13 @@ const Maps: React.FC = () => {
         </button>
       </div>
 
-      <div className="h-[500px] w-full rounded-lg overflow-hidden border">
+      <h1 className="mt-8 text-4xl font-bold tracking-tight text-[#ffb703]">
+        Maps
+      </h1>
+
+      <div className="mt-8 h-[500px] w-full rounded-lg overflow-hidden border">
         <MapContainer
-          center={[1.2966, 103.7764]}
+          center={[1.2986139477272356, 103.77523714948109]}
           zoom={15}
           style={{ height: '600px' }}
         >
@@ -59,9 +63,9 @@ const Maps: React.FC = () => {
             url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          <Marker position={[1.2966, 103.7764]}>
+          <Marker position={[1.2986139477272356, 103.77523714948109]}>
             <Popup>
-              famous hill of nus
+              YIH
             </Popup>
           </Marker>
         </MapContainer>
@@ -69,12 +73,9 @@ const Maps: React.FC = () => {
 
 
       {/* PAGE CONTENT */}
-      <h1 className="mt-8 text-4xl font-bold tracking-tight text-[#ffb703]">
-        Maps
-        </h1>
-      <p className="mt-2 text-gray-200">
+      {/* <p className="mt-2 text-gray-200">
         Welcome to the Maps! Unfortunately, the maps feature is not yet implemented.
-        </p>
+        </p> */}
 
 
     </div>

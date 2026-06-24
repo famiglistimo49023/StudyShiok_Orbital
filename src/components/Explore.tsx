@@ -3,12 +3,20 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { supabase } from '../supabase'
 
+import placeholder from '../assets/placeholder.png'
+
 type StudySpot = {
   id: number
   name: string
   location: string
   rating: number
   busyness: string
+  wifi_level: number
+  ambience_level: number
+  food_available: boolean
+
+  x_coord: number
+  y_coord: number
 } //creates object of studyspot
 
 function Explore() {
@@ -61,6 +69,7 @@ function Explore() {
     fetchProfile()
   }, [])
 
+  //depending on the selected spot, modal can show diff info
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
 
   return (
@@ -155,25 +164,100 @@ function Explore() {
         </div>
       </div>
 
-      <h4 className="text-gray-200">
-        <i>Pictures for each spot to be added soon!</i>
-      </h4>
-
-      {/* bc i want card layout */}
+      {/*card layout */}
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+
         {filteredSpots.map((spot) => (
-          <div key={spot.id} className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg cursor pointer" onClick={() => setSelectedSpot(spot)}>
-            <h3 className="text-xl font-semibold text-gray-900">{spot.name}</h3>
-            <p className="text-gray-600">{spot.location}</p>
-            <div className="mt-4 flex items-center justify-between text-sm text-gray-700">
-                <span><b>Rating:</b> {spot.rating} / 5</span>
-                <span className="rounded-full bg-blue-100 px-3 py-1 font-medium text-blue-800"><b>{spot.busyness}</b></span>
+
+          <div key={spot.id} 
+               className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg cursor-pointer" 
+               onClick={() => setSelectedSpot(spot)}>
+              
+            <img
+              src={placeholder}
+              alt={spot.name}
+              className="w-full h-48 object-cover"
+            />
+
+
+            {/* <div className="p-4"> */}
+
+              {/* Name + Rating row */}
+              <div className="flex items-center justify-between">
+                <h3 className="mt-2 text-lg font-semibold text-gray-900">{spot.name}</h3>
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      className={`text-xl ${star <= Math.round(spot.rating) ? 'text-yellow-600' : 'text-gray-200'}`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+            <p className="text-md text-gray-600">{spot.location}</p>
+
+   {/* Icons + Busyness row */}
+        <div className="mt-3 flex items-center justify-between">
+
+          {/* WiFi, Ambience, Food icons */}
+          <div className="flex gap-2">
+
+            {/* WiFi — green if >= 3, yellow if 2, red if <= 1 */}
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
+              ${spot.wifi_level >= 3 ? 'bg-green-500' : spot.wifi_level === 2 ? 'bg-yellow-400' : 'bg-red-500'}`}
+            >
+              📶
             </div>
+
+            {/* Ambience — green if >= 3, yellow if 2, red if <= 1 */}
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
+              ${spot.ambience_level >= 3 ? 'bg-green-500' : spot.ambience_level === 2 ? 'bg-yellow-400' : 'bg-red-500'}`}
+            >
+              🔇
+            </div>
+
+            {/* Food — green if available, red if not */}
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
+              ${spot.food_available ? 'bg-green-500' : 'bg-red-500'}`}
+            >
+              🍴
+            </div>
+
+          </div>
+
+          {/* Busyness */}
+          <span className="rounded-full bg-blue-100 px-3 py-1 font-small text-blue-800">{spot.busyness}</span>
+
+        </div>
           </div>
         ))}
       </div>
 
-      
+    
+      {selectedSpot && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+            <h2 className="text-xl font-semibold text-gray-900">{selectedSpot.name}</h2>
+            <p className="mt-2 text-gray-600">{selectedSpot.location}</p>
+            <p className="mt-2 text-gray-600">Rating: {selectedSpot.rating}</p>
+            <p className="mt-2 text-gray-600">Busyness: {selectedSpot.busyness}</p>
+            <p className="mt-2 text-gray-600">WiFi Level: {selectedSpot.wifi_level}</p>
+            <p className="mt-2 text-gray-600">Ambience Level: {selectedSpot.ambience_level}</p>
+            <p className="mt-2 text-gray-600">Food Available: {selectedSpot.food_available ? 'Yes' : 'No'}</p>
+            <div className="mt-4 flex justify-end">
+              <button
+                className="rounded-lg bg-[#ff9e00] px-4 py-2 font-medium text-white transition hover:bg-[#ffb703]"
+                onClick={() => setSelectedSpot(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
