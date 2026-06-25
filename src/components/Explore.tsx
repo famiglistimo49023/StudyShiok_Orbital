@@ -42,9 +42,9 @@ function Explore() {
     fetchSpots()
   }, [])
 
-  const filteredSpots = spots.filter((spot) =>
-    spot.name.toLowerCase().includes(search.toLowerCase())
-  ) //search filter, no need to press enter to search
+  // const searchedSpots = spots.filter((spot) =>
+  //   spot.name.toLowerCase().includes(search.toLowerCase())
+  // ) //search filter, no need to press enter to search
 
   const [username, setUsername] = useState("")
 
@@ -71,6 +71,58 @@ function Explore() {
 
   //depending on the selected spot, modal can show diff info
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
+
+  const [showFilters, setShowFilters] = useState(false)
+
+  const [minRating, setMinRating] = useState(0)
+  const [busynessFilter, setBusynessFilter] = useState(0)
+  const [wifiLevelFilter, setWifiLevelFilter] = useState(0)
+  const [ambienceLevelFilter, setAmbienceLevelFilter] = useState(0)
+  const [foodFilter, setFoodFilter] = useState(0)
+
+  const filteredSpots = spots.filter((spot) => {
+
+    const matchesSearch =
+      spot.name.toLowerCase().includes(
+        search.toLowerCase()
+      )
+
+    const matchesRating =
+      spot.rating >= minRating
+
+    const matchesBusyness =
+      busynessFilter === 0 ||
+      (busynessFilter === 1 &&
+        spot.busyness === 'Free') ||
+      (busynessFilter === 2 &&
+        spot.busyness === 'Moderately Busy') ||
+      (busynessFilter === 3 &&
+        spot.busyness === 'Busy')
+
+    const matchesWifi =
+      wifiLevelFilter === 0 ||
+      spot.wifi_level >= wifiLevelFilter
+
+    const matchesAmbience =
+      ambienceLevelFilter === 0 ||
+      spot.ambience_level >= ambienceLevelFilter
+
+    const matchesFood =
+      foodFilter === 0 ||
+      (foodFilter === 1 &&
+        spot.food_available) ||
+      (foodFilter === 2 &&
+        !spot.food_available)
+
+    return (
+      matchesSearch &&
+      matchesRating &&
+      matchesBusyness &&
+      matchesWifi &&
+      matchesAmbience &&
+      matchesFood
+    )
+  })
 
   return (
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
@@ -124,7 +176,7 @@ function Explore() {
         Study spots near you, for you.
       </p>
 
-      <div className="mt-8 max-w-lg">
+      <div className="mt-8 max-w-lg flex gap-2 items-start">
         <div className="relative">
           
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -153,16 +205,29 @@ function Explore() {
             shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
 
-          <button
+          {/* <button
             type="button"
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg 
             bg-[#ff9e00] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#ffb703]"
           >
             Search
-          </button>
+          </button> */}
 
         </div>
+
+        <button
+          onClick={() => setShowFilters(true)}
+          className="right-2 top-1/2
+          rounded-lg bg-[#ff9e00] px-5 py-3 text-white hover:bg-[#ffb703]"
+        >
+          Filter
+        </button>
+
       </div>
+
+      <p className="mt-2 text-sm text-gray-400">
+        {filteredSpots.length} study spots found
+      </p>
 
       {/*card layout */}
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -256,6 +321,150 @@ function Explore() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+
+      {showFilters && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+
+          <div className="w-[500px] rounded-xl bg-white p-6 shadow-xl">
+
+            <h2 className="mb-6 text-2xl font-bold">
+              Filters
+            </h2>
+
+            {/* Rating */}
+            <div className="mb-6">
+              <label className="mb-2 block font-medium">
+                Minimum Rating: {minRating}
+              </label>
+
+              <input
+                type="range"
+                min="0"
+                max="5"
+                step="0.5"
+                value={minRating}
+                onChange={(e) =>
+                  setMinRating(Number(e.target.value))
+                }
+                className="w-full"
+              />
+            </div>
+
+            {/* Busyness */}
+            <div className="mb-6">
+              <label className="mb-2 block font-medium">
+                Busyness:
+                {' '}
+                {
+                  ['Any', 'Free', 'Moderately Busy', 'Busy']
+                    [busynessFilter]
+                }
+              </label>
+
+              <input
+                type="range"
+                min="0"
+                max="3"
+                step="1"
+                value={busynessFilter}
+                onChange={(e) =>
+                  setBusynessFilter(Number(e.target.value))
+                }
+                className="w-full"
+              />
+            </div>
+
+            {/* Wifi */}
+            <div className="mb-6">
+              <label className="mb-2 block font-medium">
+                Minimum Wifi Level:
+                {' '}
+                {wifiLevelFilter}
+              </label>
+
+              <input
+                type="range"
+                min="0"
+                max="3"
+                step="1"
+                value={wifiLevelFilter}
+                onChange={(e) =>
+                  setWifiLevelFilter(Number(e.target.value))
+                }
+                className="w-full"
+              />
+            </div>
+
+            {/* Ambience */}
+            <div className="mb-6">
+              <label className="mb-2 block font-medium">
+                Minimum Ambience Level:
+                {' '}
+                {ambienceLevelFilter}
+              </label>
+
+              <input
+                type="range"
+                min="0"
+                max="3"
+                step="1"
+                value={ambienceLevelFilter}
+                onChange={(e) =>
+                  setAmbienceLevelFilter(
+                    Number(e.target.value)
+                  )
+                }
+                className="w-full"
+              />
+            </div>
+
+            {/* Food */}
+            <div className="mb-6">
+              <label className="mb-2 block font-medium">
+                Food Available:
+                {' '}
+                {
+                  ['Any', 'Yes', 'No']
+                    [foodFilter]
+                }
+              </label>
+
+              <input
+                type="range"
+                min="0"
+                max="2"
+                step="1"
+                value={foodFilter}
+                onChange={(e) =>
+                  setFoodFilter(Number(e.target.value))
+                }
+                className="w-full"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setShowFilters(false)}
+                className="rounded-lg border px-4 py-2"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => setShowFilters(false)}
+                className="rounded-lg bg-[#ff9e00] px-4 py-2 text-white hover:bg-[#ffb703]"
+              >
+                Apply
+              </button>
+
+            </div>
+
+          </div>
+
         </div>
       )}
     </div>
