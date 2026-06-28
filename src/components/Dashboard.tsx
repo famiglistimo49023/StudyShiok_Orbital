@@ -64,8 +64,9 @@ const Dashboard: React.FC = () => {
 
 
 
-      <h1 className="pageTitle">Dashboard</h1>
-
+      <h1 className="mt-8 mb-4 text-4xl font-bold tracking-tight text-[#ffb703]">
+        Dashboard
+      </h1>
 
       <div className="statsGrid">
 

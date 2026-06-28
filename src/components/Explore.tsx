@@ -20,7 +20,7 @@ type StudySpot = {
 } //creates object of studyspot
 
 function Explore() {
-  const [spots, setSpots] = useState<StudySpot[]>([]) //initialstate should be ntg (??)
+  const [spots, setSpots] = useState<StudySpot[]>([]) //initialstate should be ntg 
   const [search, setSearch] = useState('')
   //without useState, component wont rerender after fetching data, so spots will be empty array and nothing will show up on explore page
 
@@ -82,11 +82,6 @@ function Explore() {
 
   const filteredSpots = spots.filter((spot) => {
 
-    const matchesSearch =
-      spot.name.toLowerCase().includes(
-        search.toLowerCase()
-      )
-
     const matchesRating =
       spot.rating >= minRating
 
@@ -114,14 +109,12 @@ function Explore() {
       (foodFilter === 2 &&
         !spot.food_available)
 
-    return (
-      matchesSearch &&
-      matchesRating &&
-      matchesBusyness &&
-      matchesWifi &&
-      matchesAmbience &&
-      matchesFood
+    const matchesSearch =
+      spot.name.toLowerCase().includes(
+        search.toLowerCase()
     )
+
+    return (matchesSearch && matchesRating && matchesBusyness && matchesWifi && matchesAmbience && matchesFood)
   })
 
   return (
@@ -252,10 +245,7 @@ function Explore() {
                 <h3 className="mt-2 text-lg font-semibold text-gray-900">{spot.name}</h3>
                 <div className="flex items-center gap-0.5">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <span
-                      key={star}
-                      className={`text-xl ${star <= Math.round(spot.rating) ? 'text-yellow-600' : 'text-gray-200'}`}
-                    >
+                    <span key={star} className={`text-xl ${star <= Math.round(spot.rating) ? 'text-yellow-600' : 'text-gray-200'}`}>
                       ★
                     </span>
                   ))}
@@ -270,10 +260,12 @@ function Explore() {
           {/* WiFi, Ambience, Food icons */}
           <div className="flex gap-2">
 
-            {/* WiFi — green if >= 3, yellow if 2, red if <= 1 */}
+            {/* wifi icon */}
             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
-              ${spot.wifi_level >= 3 ? 'bg-green-500' : spot.wifi_level === 2 ? 'bg-yellow-400' : 'bg-red-500'}`}
-            >
+              ${spot.wifi_level >= 3 ? 'bg-green-500' 
+                : spot.wifi_level === 2 ? 'bg-yellow-400' 
+                : 'bg-red-500'}`}> 
+            {/* 3 -> green, 2 -> yellow, 1 -> red */}
               📶
             </div>
 

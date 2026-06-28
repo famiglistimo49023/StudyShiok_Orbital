@@ -1,9 +1,38 @@
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
+import { supabase } from "../supabase" // <-- add this
 
-import { Link, useNavigate } from 'react-router-dom'
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'
+type StudySpot = {
+  id: number
+  name: string
+  location: string
+  x_coord: number
+  y_coord: number
+}
 
 const Maps: React.FC = () => {
   const navigate = useNavigate()
+
+  //stores all the study spots fetched from supabase
+  const [spots, setSpots] = useState<StudySpot[]>([])
+
+  //fetch them study spots when page loads
+  useEffect(() => {
+    const fetchSpots = async () => {
+      const { data, error } = await supabase
+        .from("studyspots")
+        .select("id, name, location, x_coord, y_coord")
+
+      if (error) {
+        console.error("Error fetching study spots:", error)
+      } else {
+        setSpots(data || [])
+      }
+    }
+
+    fetchSpots()
+  }, [])
 
   return (
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
@@ -14,7 +43,7 @@ const Maps: React.FC = () => {
             to="/explore"
             className="transition-colors hover:text-[#bfdbf7]"
           >
-          Explore
+            Explore
           </Link>
 
           <Link
@@ -39,11 +68,9 @@ const Maps: React.FC = () => {
           </Link>
         </div>
 
-        
-
         <button
           className="rounded-lg bg-[#ff9e00] px-4 py-2 font-medium text-white transition hover:bg-[#ffb703]"
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
         >
           Log Out
         </button>
@@ -53,33 +80,34 @@ const Maps: React.FC = () => {
         Maps
       </h1>
 
-      <div className="mt-8 h-[500px] w-full rounded-lg overflow-hidden border">
+      <div className="mt-8 h-[500px] w-full overflow-hidden rounded-lg border">
         <MapContainer
           center={[1.2986139477272356, 103.77523714948109]}
           zoom={15}
-          style={{ height: '600px' }}
+          style={{ height: "100%", width: "100%" }}
         >
           <TileLayer
             url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          <Marker position={[1.2986139477272356, 103.77523714948109]}>
-            <Popup>
-              YIH
-            </Popup>
-          </Marker>
+          {/*create marker for every study spot */}
+          {spots.map((spot) => (
+            <Marker
+              key={spot.id}
+              position={[spot.x_coord, spot.y_coord]}
+            >
+              <Popup> {/*what do i see after i click */}
+                <strong>{spot.name}</strong>
+                <br />
+                {spot.location}
+              </Popup>
+            </Marker>
+          ))}
+
         </MapContainer>
       </div>
 
-
-      {/* PAGE CONTENT */}
-      {/* <p className="mt-2 text-gray-200">
-        Welcome to the Maps! Unfortunately, the maps feature is not yet implemented.
-        </p> */}
-
-
     </div>
-    
   )
 }
 
