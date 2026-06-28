@@ -35,7 +35,7 @@ function Explore() {
       if (error) {
         console.error('Error fetching spots:', error) //might fail bc network error
       } else {
-        setSpots(data) //action to update state var
+        setSpots(data ?? []) //action to update state var
       }
     }
 
@@ -45,29 +45,6 @@ function Explore() {
   // const searchedSpots = spots.filter((spot) =>
   //   spot.name.toLowerCase().includes(search.toLowerCase())
   // ) //search filter, no need to press enter to search
-
-  const [username, setUsername] = useState("")
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: authData } = await supabase.auth.getUser()
-      if (!authData.user) return
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('display_name')
-        .eq('id', authData.user.id)
-        .single()
-
-      if (error) {
-        console.error('Error fetching profile:', error)
-      } else {
-        setUsername(data.display_name)
-      }
-    }
-
-    fetchProfile()
-  }, [])
 
   //depending on the selected spot, modal can show diff info
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
@@ -162,7 +139,7 @@ function Explore() {
       </div>
 
       <h1 className="mt-8 text-4xl font-bold tracking-tight text-[#ffb703]">
-        Welcome, {username}!
+        Welcome to Explore
       </h1>
 
       <p className="mt-2 text-gray-200">
