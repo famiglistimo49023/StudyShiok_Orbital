@@ -1,22 +1,70 @@
 
 import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { supabase } from '../supabase'
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate()
 
+  useEffect(() => {
+  const fetchData = async () => {
+    const { data: userData } = await supabase.auth.getUser()
+    if (!userData?.user) return
 
-  //hardcoded for now
-  const stats = {
-    bookmarkedCount: 1,
-    ratingsGiven: 4,
-    avgRating: 4.5,
-    notBusySpots: 2
+    const userId = userData.user.id
+
+    // bookmarks
+    const { data: bookmarks } = await supabase
+      .from('bookmarks')
+      .select('studyspot_id')
+      .eq('user_id', userId)
+
+    // ratings
+    const { data: ratings } = await supabase
+      .from('ratings')
+      .select('rating')
+      .eq('user_id', userId)
+    
+    const { data: spots } = await supabase
+      .from('bookmarks')
+      .select(`
+    studyspot_id,
+    studyspots (
+      id,
+      name,
+      campusArea,
+      rating,
+      busyness
+    )
+  `)
+  .eq('user_id', userId)
+
+setBookmarkedSpots(spots || [])
+    const avg =
+      ratings && ratings.length > 0
+        ? ratings.reduce((a, b) => a + b.rating, 0) / ratings.length
+        : 0
+
+    setStats({
+      bookmarkedCount: bookmarks?.length || 0,
+      ratingsGiven: ratings?.length || 0,
+      avgRating: Number(avg.toFixed(1)),
+      notBusySpots: 0 // keep placeholder for now
+    })
   }
 
+  fetchData()
+}, [])
+  //trying to link to supabase
+  const [stats, setStats] = useState({
+  bookmarkedCount: 0,
+  ratingsGiven: 0,
+  avgRating: 0,
+  notBusySpots: 0
+  })
+
   //hardcoded for now
-  const bookmarkedSpots = [
-    { id: 1, name: 'ERC Level 2', campusArea: 'UTown', rating: 4.6, busyness: 'Moderately Busy' }
-  ]
+  const [bookmarkedSpots, setBookmarkedSpots] = useState<any[]>([])
 
   return (
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
