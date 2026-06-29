@@ -44,13 +44,10 @@ type LocationPickerProps = {
 }
 
 const LocationPicker = ({ setXCoord, setYCoord }: LocationPickerProps) => {
-  useMapEvents({
-    click(e) {
-      setXCoord(e.latlng.lat)
-      setYCoord(e.latlng.lng)
-    }
-  })
-
+  useMapEvents({ click(point) { //update lat and lang when clicked
+      setXCoord(point.latlng.lat)
+      setYCoord(point.latlng.lng)
+    }})
   return null
 }
 
@@ -102,24 +99,22 @@ const Suggest: React.FC = () => {
       return
     }
 
-  const { error : insertError } = await supabase
+  const { error : error } = await supabase
     .from('studyspots')
     .insert({
-      name,
-      location,
-      rating,
+      name, location, rating,
       wifi_level: wifiLevel,
       ambience_level: ambienceLevel,
       food_available: foodAvailable === 'yes',
       x_coord: xCoord,
       y_coord: yCoord,
 
-      //default values here
+      //busyness default for now
       busyness: 'Free'
   })
 
-    if (insertError) {
-      console.error('Error submitting study spot:', insertError)
+    if (error) {
+      console.error('Error submitting study spot:', error)
       setError('Unable to submit study spot. Please try again.')
       setIsSubmitting(false)
       return

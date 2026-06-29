@@ -116,47 +116,70 @@ setBookmarkedSpots(spots || [])
         Dashboard
       </h1>
 
-      <div className="statsGrid">
-
-        <div className="statCard">
-          <h3>Bookmarked Spots</h3>
-          <p>{stats.bookmarkedCount}</p>
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-xl bg-white p-6 shadow-md">
+          <h3 className="text-sm font-medium text-gray-500">Bookmarked Spots</h3>
+          <p className="mt-3 text-4xl font-bold text-[#065088]">
+            {stats.bookmarkedCount}
+          </p>
         </div>
 
-        <div className="statCard">
-          <h3>Ratings Given</h3>
-          <p>{stats.ratingsGiven}</p>
+        <div className="rounded-xl bg-white p-6 shadow-md">
+          <h3 className="text-sm font-medium text-gray-500">Ratings Given</h3>
+          <p className="mt-3 text-4xl font-bold text-[#065088]">
+            {stats.ratingsGiven}
+          </p>
         </div>
 
-        <div className="statCard">
-          <h3>Avg Rating Given</h3>
-          <p>{stats.avgRating}</p>
+        <div className="rounded-xl bg-white p-6 shadow-md">
+          <h3 className="text-sm font-medium text-gray-500">Avg Rating Given</h3>
+          <p className="mt-3 text-4xl font-bold text-[#065088]">
+            {stats.avgRating}
+          </p>
         </div>
 
-        <div className="statCard">
-          <h3>Not Busy Spots</h3>
-          <p>{stats.notBusySpots}</p>
+        <div className="rounded-xl bg-white p-6 shadow-md">
+          <h3 className="text-sm font-medium text-gray-500">Not Busy Spots</h3>
+          <p className="mt-3 text-4xl font-bold text-[#065088]">
+            {stats.notBusySpots}
+          </p>
         </div>
-
       </div>
 
+      <h2 className="mt-12 text-2xl font-bold text-[#ffb703]">
+        Your Bookmarked Spots
+      </h2>
 
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {bookmarkedSpots.map((bookmark) => {
+          const spot = bookmark.studyspots
 
-      <h2 className="sectionTitle">Your Bookmarked Spots</h2>
+          return (
+            <div
+              key={bookmark.studyspot_id}
+              className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">
+                {spot?.name}
+              </h3>
 
-      <div className="cardGrid">
-        {bookmarkedSpots.map((spot) => (
-          <div key={spot.id} className="card">
-            <h3>{spot.name}</h3>
-            <p>{spot.campusArea}</p>
-            <div className="cardInfoRow">
-                <span><b>Rating:</b> {spot.rating} / 5</span>
-                <span><b>{spot.busyness}</b></span>
+              <p className="mt-1 text-gray-600">
+                {spot?.location}
+              </p>
+
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-sm text-gray-700">
+                  <b>Rating:</b> {spot?.rating} / 5
+                </span>
+
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+                  {spot?.busyness}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
-
     </div>
   )
 }
