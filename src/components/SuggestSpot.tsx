@@ -7,6 +7,7 @@ import {
   Popup,
   useMapEvents
 } from 'react-leaflet'
+import { supabase } from '../supabase'
 
 type StarRatingProps = {
   rating: number
@@ -68,6 +69,10 @@ const Suggest: React.FC = () => {
   const [xCoord, setXCoord] = useState<number | null>(null)
   const [yCoord, setYCoord] = useState<number | null>(null)
 
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const formComplete =
     name.trim() !== '' &&
     location.trim() !== '' &&
@@ -78,21 +83,53 @@ const Suggest: React.FC = () => {
     xCoord !== null &&
     yCoord !== null
 
-  const handleSubmit = () => {
-    if (!formComplete) return
+  const handleSubmit = async () => {
+    setError('')
+    setSuccess('')
 
-    console.log({
+    if (!formComplete) {
+      setError('Please complete all fields before submitting.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    const { data: authData, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !authData.user) {
+      setError('You must be logged in to submit a study spot.')
+      setIsSubmitting(false)
+      return
+    }
+
+  const { error : insertError } = await supabase
+    .from('studyspots')
+    .insert({
       name,
       location,
+      rating,
       wifi_level: wifiLevel,
       ambience_level: ambienceLevel,
       food_available: foodAvailable === 'yes',
-      rating,
       x_coord: xCoord,
-      y_coord: yCoord
-    })
+      y_coord: yCoord,
 
-    navigate('/dashboard')
+      //default values here
+      busyness: 'Free'
+  })
+
+    if (insertError) {
+      console.error('Error submitting study spot:', insertError)
+      setError('Unable to submit study spot. Please try again.')
+      setIsSubmitting(false)
+      return
+    }
+
+    setSuccess('Study spot suggestion submitted successfully!')
+
+    setTimeout(() => {
+      navigate('/explore')
+    }, 1000)
   }
 
   return (
@@ -218,23 +255,35 @@ const Suggest: React.FC = () => {
               />
             </div>
 
+            {error && (
+              <p className="rounded-lg bg-red-100 px-4 py-2 text-sm text-red-700">
+                {error}
+              </p>
+            )}
+
+            {success && (
+              <p className="rounded-lg bg-green-100 px-4 py-2 text-sm text-green-700">
+                {success}
+              </p>
+            )}
+
             <button
               className={`w-full rounded-lg px-4 py-3 font-medium text-white transition ${
-                formComplete
+                formComplete && !isSubmitting
                   ? 'bg-[#ff9e00] hover:bg-[#ffb703]'
                   : 'cursor-not-allowed bg-gray-400'
               }`}
               onClick={handleSubmit}
-              disabled={!formComplete}
+              disabled={!formComplete || isSubmitting}
             >
-              Submit Study Spot
+              {isSubmitting ? 'Submitting...' : 'Submit Study Spot'}
             </button>
           </div>
         </div>
 
         <div className="rounded-xl bg-white p-6 shadow-md">
           <h2 className="mb-4 text-xl font-semibold text-gray-900">
-            Select Location of your Study Spot here!
+            Select Location on Map
           </h2>
 
           <div className="h-[500px] overflow-hidden rounded-lg border">
