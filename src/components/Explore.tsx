@@ -309,7 +309,7 @@ function Explore() {
                 Minimum Rating
               </label>
 
-              <div className="flex items-center gap-1">
+              <div className="flex justify-center items-center gap-1">
                 {[1,2,3,4,5].map((star) => (
                   <button
                     key={star}
@@ -367,7 +367,7 @@ function Explore() {
             {/* Wifi */}
             <div className="mb-6">
               <label className="mb-2 block font-medium">
-                Minimum WiFi
+                WiFi Level
               </label>
 
               <div className="flex gap-2">
@@ -396,15 +396,15 @@ function Explore() {
             {/* Ambience */}
             <div className="mb-6">
               <label className="mb-2 block font-medium">
-                Quietness
+                Ambience Level
               </label>
 
               <div className="flex gap-2">
                 {[
                   { label: "Any", value: 0 },
-                  { label: "🔊", value: 1 },
+                  { label: "🔇", value: 1 },
                   { label: "🔉", value: 2 },
-                  { label: "🔇", value: 3 },
+                  { label: "🔊", value: 3 },
                 ].map((option) => (
                   <button
                     key={option.value}
@@ -425,7 +425,7 @@ function Explore() {
             {/* Food */}
             <div className="mb-6">
               <label className="mb-2 block font-medium">
-                Food
+                Food Options
               </label>
 
               <div className="flex gap-2">

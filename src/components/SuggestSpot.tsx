@@ -9,6 +9,10 @@ import {
 } from 'react-leaflet'
 import { supabase } from '../supabase'
 
+import redwifi from '../assets/dog_redwifi.png'
+import yellowwifi from '../assets/dog_yellowwifi.png'
+import greenwifi from '../assets/dog_greenwifi.png'
+
 type StarRatingProps = {
   rating: number
   setRating: (val: number) => void
@@ -51,18 +55,70 @@ const LocationPicker = ({ setXCoord, setYCoord }: LocationPickerProps) => {
   return null
 }
 
+    type ToggleProps = {
+      label: string
+      checked: boolean
+      setChecked: (value: boolean) => void
+    }
+
+    const Toggle = ({
+      label,
+      checked,
+      setChecked,
+    }: ToggleProps) => (
+      <div className="flex items-center justify-between rounded-lg border p-3">
+        <span>{label}</span>
+
+        <button
+          type="button"
+          onClick={() => setChecked(!checked)}
+          className={`relative h-6 w-11 rounded-full transition ${
+            checked
+              ? 'bg-[#ff9e00]'
+              : 'bg-gray-300'
+          }`}
+        >
+          <span
+            className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white transition ${
+              checked ? 'translate-x-5' : ''
+            }`}
+          />
+        </button>
+      </div>
+    )
+
 const Suggest: React.FC = () => {
   const navigate = useNavigate()
 
   const [name, setName] = useState('')
   const [location, setLocation] = useState('')
 
-  const [wifiLevel, setWifiLevel] = useState(0)
-  const [ambienceLevel, setAmbienceLevel] = useState(0)
-  const [foodAvailable, setFoodAvailable] = useState('')
+  // const [wifiLevel, setWifiLevel] = useState(0)
+  // const [ambienceLevel, setAmbienceLevel] = useState(0)
+  // const [foodAvailable, setFoodAvailable] = useState('')
 
+  //overall rating
   const [rating, setRating] = useState(0)
 
+  //for ambience
+  const [quietness, setQuietness] = useState(0)
+  const [cleanliness, setCleanliness] = useState(0)
+  const [lighting, setLighting] = useState(0)
+  const [seatingComfort, setSeatingComfort] = useState(0)
+
+  //for wifi
+  const [wifiLevel, setWifiLevel] = useState(3)
+  //since wifi is compulsory, setting default as good wifi
+
+
+  //amenities
+  const [powerOutlets, setPowerOutlets] = useState(false)
+  const [airConditioning, setAirConditioning] = useState(false)
+  const [foodNearby, setFoodNearby] = useState(false)
+  const [groupFriendly, setGroupFriendly] = useState(false)
+  const [openLate, setOpenLate] = useState(false)
+
+  //gps using openstreetmap 
   const [xCoord, setXCoord] = useState<number | null>(null)
   const [yCoord, setYCoord] = useState<number | null>(null)
 
@@ -70,15 +126,18 @@ const Suggest: React.FC = () => {
   const [success, setSuccess] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const formComplete =
-    name.trim() !== '' &&
-    location.trim() !== '' &&
-    wifiLevel !== 0 &&
-    ambienceLevel !== 0 &&
-    foodAvailable !== '' &&
-    rating !== 0 &&
-    xCoord !== null &&
-    yCoord !== null
+const formComplete =
+  name.trim() !== '' &&
+  location.trim() !== '' &&
+  rating !== 0 &&
+  quietness !== 0 &&
+  cleanliness !== 0 &&
+  lighting !== 0 &&
+  seatingComfort !== 0 &&
+  wifiLevel !== 0 &&
+  xCoord !== null &&
+  yCoord !== null
+  //amenities are optional to indicate, a bit of a concern for me
 
   const handleSubmit = async () => {
     setError('')
@@ -103,9 +162,17 @@ const Suggest: React.FC = () => {
     .from('studyspots')
     .insert({
       name, location, rating,
+      quietness,
+      cleanliness,
+      lighting,
+      seatingComfort,
       wifi_level: wifiLevel,
-      ambience_level: ambienceLevel,
-      food_available: foodAvailable === 'yes',
+
+      power_outlets: powerOutlets,
+      air_conditioning: airConditioning,
+      food_nearby: foodNearby,
+      group_friendly: groupFriendly,
+      open_late: openLate,
       x_coord: xCoord,
       y_coord: yCoord,
 
@@ -182,49 +249,138 @@ const Suggest: React.FC = () => {
             />
 
             <div>
-              <label className="mb-2 block font-medium text-gray-800">
-                WiFi Level: {wifiLevel || 'Not selected'}
+              <label className="mb-4 block text-center font-medium text-gray-800">
+                WiFi Strength
               </label>
-              <input
-                type="range"
-                min="0"
-                max="3"
-                step="1"
-                value={wifiLevel}
-                onChange={(e) => setWifiLevel(Number(e.target.value))}
-                className="w-full"
-              />
+
+              <div className="flex items-center justify-center">
+
+                {/* Dog Image */}
+                <img
+                  src={
+                    wifiLevel === 1
+                      ? redwifi
+                      : wifiLevel === 2
+                      ? yellowwifi
+                      : greenwifi
+                  }
+                  alt="WiFi Strength"
+                  className="h-56 w-auto select-none"
+                  draggable={false}
+                />
+
+                {/* Vertical Slider */}
+                <input
+                  type="range"
+                  min="1"
+                  max="3"
+                  step="1"
+                  value={wifiLevel}
+                  onChange={(e) => setWifiLevel(Number(e.target.value))}
+                  className="
+                    h-56
+                    cursor-pointer
+                    appearance-none
+                    bg-transparent
+                    [writing-mode:bt-lr]
+                    [-webkit-appearance:slider-vertical]
+                  "
+                />
+
+              </div>
             </div>
 
-            <div>
-              <label className="mb-2 block font-medium text-gray-800">
-                Ambience Level: {ambienceLevel || 'Not selected'}
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="3"
-                step="1"
-                value={ambienceLevel}
-                onChange={(e) => setAmbienceLevel(Number(e.target.value))}
-                className="w-full"
-              />
+            <h3 className="mb-4 text-lg font-semibold">
+              Study Environment
+            </h3>
+
+            <div className="grid grid-cols-2 gap-8">
+
+              <div>
+                <label className="mb-2 block font-medium">
+                  Quietness
+                </label>
+
+                <StarRating
+                  rating={quietness}
+                  setRating={setQuietness}
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-medium">
+                  Lighting
+                </label>
+
+                <StarRating
+                  rating={lighting}
+                  setRating={setLighting}
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-medium">
+                  Cleanliness
+                </label>
+
+                <StarRating
+                  rating={cleanliness}
+                  setRating={setCleanliness}
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-medium">
+                  Seating Comfort
+                </label>
+
+                <StarRating
+                  rating={seatingComfort}
+                  setRating={setSeatingComfort}
+                />
+              </div>
+
             </div>
 
-            <div>
-              <label className="mb-2 block font-medium text-gray-800">
-                Food Availability
-              </label>
 
-              <select
-                value={foodAvailable}
-                onChange={(e) => setFoodAvailable(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">Select an option</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
+            <div>
+              <h3 className="mb-4 text-lg font-semibold">
+                Amenities
+              </h3>
+
+              <div className="space-y-3">
+
+                <Toggle
+                  label="🔌 Power Outlets"
+                  checked={powerOutlets}
+                  setChecked={setPowerOutlets}
+                />
+
+                <Toggle
+                  label="❄️ Air Conditioning"
+                  checked={airConditioning}
+                  setChecked={setAirConditioning}
+                />
+
+                <Toggle
+                  label="🍴 Food Nearby"
+                  checked={foodNearby}
+                  setChecked={setFoodNearby}
+                />
+
+                <Toggle
+                  label="👥 Group Friendly"
+                  checked={groupFriendly}
+                  setChecked={setGroupFriendly}
+                />
+
+                <Toggle
+                  label="🌙 Open Late"
+                  checked={openLate}
+                  setChecked={setOpenLate}
+                />
+
+              </div>
             </div>
 
             <div>
