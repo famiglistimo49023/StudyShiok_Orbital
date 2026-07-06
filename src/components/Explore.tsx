@@ -306,112 +306,144 @@ function Explore() {
             {/* Rating */}
             <div className="mb-6">
               <label className="mb-2 block font-medium">
-                Minimum Rating: {minRating}
+                Minimum Rating
               </label>
 
-              <input
-                type="range"
-                min="0"
-                max="5"
-                step="0.5"
-                value={minRating}
-                onChange={(e) =>
-                  setMinRating(Number(e.target.value))
-                }
-                className="w-full"
-              />
-            </div>
+              <div className="flex items-center gap-1">
+                {[1,2,3,4,5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setMinRating(star)}
+                    className="text-4xl transition hover:scale-110"
+                  >
+                    <span
+                      className={
+                        star <= minRating
+                          ? "text-yellow-500"
+                          : "text-gray-300"
+                      }
+                    >
+                      ★
+                    </span>
+                  </button>
+                ))}
 
+                <button
+                  onClick={() => setMinRating(0)}
+                  className="ml-4 rounded-md bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+            
             {/* Busyness */}
             <div className="mb-6">
               <label className="mb-2 block font-medium">
-                Busyness:
-                {' '}
-                {
-                  ['Any', 'Free', 'Moderately Busy', 'Busy']
-                    [busynessFilter]
-                }
+                Busyness
               </label>
 
-              <input
-                type="range"
-                min="0"
-                max="3"
-                step="1"
-                value={busynessFilter}
-                onChange={(e) =>
-                  setBusynessFilter(Number(e.target.value))
-                }
-                className="w-full"
-              />
-            </div>
+              <div className="flex gap-2 flex-wrap">
+                {["Any", "Free", "Moderately Busy", "Busy"].map(
+                  (label, index) => (
+                    <button
+                      key={label}
+                      onClick={() => setBusynessFilter(index)}
+                      className={`rounded-lg px-4 py-2 transition
+                        ${
+                          busynessFilter === index
+                            ? "bg-[#ff9e00] text-white"
+                            : "bg-gray-100 hover:bg-gray-200"
+                        }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>  
+
 
             {/* Wifi */}
             <div className="mb-6">
               <label className="mb-2 block font-medium">
-                Minimum Wifi Level:
-                {' '}
-                {wifiLevelFilter}
+                Minimum WiFi
               </label>
 
-              <input
-                type="range"
-                min="0"
-                max="3"
-                step="1"
-                value={wifiLevelFilter}
-                onChange={(e) =>
-                  setWifiLevelFilter(Number(e.target.value))
-                }
-                className="w-full"
-              />
+              <div className="flex gap-2">
+                {[
+                  { icon: "Any", value: 0 },
+                  { icon: "📶", value: 1 },
+                  { icon: "📶📶", value: 2 },
+                  { icon: "📶📶📶", value: 3 },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setWifiLevelFilter(option.value)}
+                    className={`rounded-lg px-4 py-2 transition
+                      ${
+                        wifiLevelFilter === option.value
+                          ? "bg-[#ff9e00] text-white"
+                          : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                  >
+                    {option.icon}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Ambience */}
             <div className="mb-6">
               <label className="mb-2 block font-medium">
-                Minimum Ambience Level:
-                {' '}
-                {ambienceLevelFilter}
+                Quietness
               </label>
 
-              <input
-                type="range"
-                min="0"
-                max="3"
-                step="1"
-                value={ambienceLevelFilter}
-                onChange={(e) =>
-                  setAmbienceLevelFilter(
-                    Number(e.target.value)
-                  )
-                }
-                className="w-full"
-              />
+              <div className="flex gap-2">
+                {[
+                  { label: "Any", value: 0 },
+                  { label: "🔊", value: 1 },
+                  { label: "🔉", value: 2 },
+                  { label: "🔇", value: 3 },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setAmbienceLevelFilter(option.value)}
+                    className={`rounded-lg px-4 py-2 transition
+                      ${
+                        ambienceLevelFilter === option.value
+                          ? "bg-[#ff9e00] text-white"
+                          : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Food */}
             <div className="mb-6">
               <label className="mb-2 block font-medium">
-                Food Available:
-                {' '}
-                {
-                  ['Any', 'Yes', 'No']
-                    [foodFilter]
-                }
+                Food
               </label>
 
-              <input
-                type="range"
-                min="0"
-                max="2"
-                step="1"
-                value={foodFilter}
-                onChange={(e) =>
-                  setFoodFilter(Number(e.target.value))
-                }
-                className="w-full"
-              />
+              <div className="flex gap-2">
+                {["Any", "Has Food", "No Food"].map((label, index) => (
+                  <button
+                    key={label}
+                    onClick={() => setFoodFilter(index)}
+                    className={`rounded-lg px-4 py-2 transition
+                      ${
+                        foodFilter === index
+                          ? "bg-[#ff9e00] text-white"
+                          : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="flex justify-end gap-3">
