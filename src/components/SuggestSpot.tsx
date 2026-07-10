@@ -1,3 +1,5 @@
+//imports
+
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -11,14 +13,14 @@ import { supabase } from '../supabase'
 
 import redwifi from '../assets/dog_redwifi.png'
 import yellowwifi from '../assets/dog_yellowwifi.png'
-import greenwifi from '../assets/dog_greenwifi.png'
+import greenwifi from '../assets/dog_greenwifi.png' //img for wifi strength indicator
 
 type StarRatingProps = {
   rating: number
   setRating: (val: number) => void
 }
 
-const StarRating = ({ rating, setRating }: StarRatingProps) => {
+const StarRating = ({ rating, setRating }: StarRatingProps) => { //auto generate stars selection for rating
   const [hover, setHover] = useState(0)
 
   return (
@@ -42,7 +44,7 @@ const StarRating = ({ rating, setRating }: StarRatingProps) => {
   )
 }
 
-type LocationPickerProps = {
+type LocationPickerProps = { //for map click
   setXCoord: (val: number) => void
   setYCoord: (val: number) => void
 }
@@ -55,37 +57,37 @@ const LocationPicker = ({ setXCoord, setYCoord }: LocationPickerProps) => {
   return null
 }
 
-    type ToggleProps = {
-      label: string
-      checked: boolean
-      setChecked: (value: boolean) => void
-    }
+type ToggleProps = { //for toggle switches
+  label: string
+  checked: boolean
+  setChecked: (value: boolean) => void
+}
 
-    const Toggle = ({
-      label,
-      checked,
-      setChecked,
-    }: ToggleProps) => (
-      <div className="flex items-center justify-between rounded-lg border p-3">
-        <span>{label}</span>
+const Toggle = ({
+  label,
+  checked,
+  setChecked,
+}: ToggleProps) => (
+  <div className="flex items-center justify-between rounded-lg border p-3">
+    <span>{label}</span>
 
-        <button
-          type="button"
-          onClick={() => setChecked(!checked)}
-          className={`relative h-6 w-11 rounded-full transition ${
-            checked
-              ? 'bg-[#ff9e00]'
-              : 'bg-gray-300'
-          }`}
-        >
-          <span
-            className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white transition ${
-              checked ? 'translate-x-5' : ''
-            }`}
-          />
-        </button>
-      </div>
-    )
+    <button
+      type="button"
+      onClick={() => setChecked(!checked)}
+      className={`relative h-6 w-11 rounded-full transition ${
+        checked
+          ? 'bg-[#ff9e00]'
+          : 'bg-gray-300'
+      }`}
+    >
+      <span
+        className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white transition ${
+          checked ? 'translate-x-5' : ''
+        }`}
+      />
+    </button>
+  </div>
+)
 
 const Suggest: React.FC = () => {
   const navigate = useNavigate()
@@ -122,22 +124,27 @@ const Suggest: React.FC = () => {
   const [xCoord, setXCoord] = useState<number | null>(null)
   const [yCoord, setYCoord] = useState<number | null>(null)
 
+  //image saving
+  const [image, setImage] = useState<File | null>(null)
+
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-const formComplete =
-  name.trim() !== '' &&
-  location.trim() !== '' &&
-  rating !== 0 &&
-  quietness !== 0 &&
-  cleanliness !== 0 &&
-  lighting !== 0 &&
-  seatingComfort !== 0 &&
-  wifiLevel !== 0 &&
-  xCoord !== null &&
-  yCoord !== null
-  //amenities are optional to indicate, a bit of a concern for me
+
+
+  const formComplete = //what is required for the form to submit?
+    name.trim() !== '' &&
+    location.trim() !== '' &&
+    rating !== 0 &&
+    quietness !== 0 &&
+    cleanliness !== 0 &&
+    lighting !== 0 &&
+    seatingComfort !== 0 &&
+    wifiLevel !== 0 &&
+    xCoord !== null &&
+    yCoord !== null
+    //amenities are ambiguous to indicate, a bit of a concern for me
 
   const handleSubmit = async () => {
     setError('')
@@ -158,33 +165,67 @@ const formComplete =
       return
     }
 
-  const { error : error } = await supabase
-    .from('studyspots')
-    .insert({
-      name, location, rating,
-      quietness,
-      cleanliness,
-      lighting,
-      seatingComfort,
-      wifi_level: wifiLevel,
+    const { data: studySpot, error : formError } = await supabase //saving data as studySpot to save studySpot.id
+      .from('studyspots')
+      .insert({
+        name, location, rating,
+        quietness,
+        cleanliness,
+        lighting,
+        seatingComfort,
+        wifi_level: wifiLevel,
 
-      power_outlets: powerOutlets,
-      air_conditioning: airConditioning,
-      food_nearby: foodNearby,
-      group_friendly: groupFriendly,
-      open_late: openLate,
-      x_coord: xCoord,
-      y_coord: yCoord,
+        power_outlets: powerOutlets,
+        air_conditioning: airConditioning,
+        food_nearby: foodNearby,
+        group_friendly: groupFriendly,
+        open_late: openLate,
+        x_coord: xCoord,
+        y_coord: yCoord,
 
-      //busyness default for now
-      busyness: 'Free'
-  })
+        //busyness default for now
+        busyness: 'Free'
+    }).select().single() //only saves studySpot.id, faster
 
-    if (error) {
-      console.error('Error submitting study spot:', error)
-      setError('Unable to submit study spot. Please try again.')
-      setIsSubmitting(false)
-      return
+    if (image) {
+      const extension = image.name.split('.').pop()
+
+      const filePath =
+        `${studySpot.id}/${crypto.randomUUID()}.${extension}` //creates folder for new spot and adds image with random uuid
+
+      const { error: uploadError } = await supabase.storage
+        .from('studyspot-img') //uses supabase storage bucket
+        .upload(filePath, image)
+
+      if (uploadError) {
+          console.error('Error uploading image:', uploadError)
+          setError("Failed to upload image.")
+          setIsSubmitting(false)
+          return
+      }
+
+      if (formError) {
+        console.error('Error submitting study spot:', formError)
+        setError('Unable to submit study spot. Please try again.')
+        setIsSubmitting(false)
+        return
+      }
+
+      const { error: imageError } = await supabase
+        .from('studyspot_images') //not to be confused with storage, this is the db
+        .insert({
+          studyspot_id: studySpot.id,
+          img_path: filePath,
+          display_order: 1,
+        })
+      
+      if (imageError) {
+        console.error('Error saving image path:', imageError)
+        setError('Unable to save image path. Please try again.')
+        setIsSubmitting(false)
+        return
+      }
+
     }
 
     setSuccess('Study spot suggestion submitted successfully!')
@@ -461,6 +502,32 @@ const formComplete =
           <p className="mt-3 text-sm text-gray-600">
             Click on the map to automatically fill in the coordinates.
           </p>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (!e.target.files || e.target.files.length === 0) return
+
+              setImage(e.target.files[0])
+            }}
+          />
+
+          {/* Image Preview */}
+          {image && (
+            <div className="mt-4">
+              <p className="mb-2 font-medium text-gray-800">
+                Selected Image
+              </p>
+
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Study Spot Preview"
+                className="h-56 w-full rounded-lg border object-cover shadow"
+              />
+            </div>
+          )}
+
         </div>
       </div>
     </div>
