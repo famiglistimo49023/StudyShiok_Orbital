@@ -127,7 +127,7 @@ const Suggest: React.FC = () => {
   //image saving
   const [image, setImage] = useState<File | null>(null)
 
-  const [error, setError] = useState('')
+  const [error, setError] = useState('') 
   const [success, setSuccess] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -503,30 +503,53 @@ const Suggest: React.FC = () => {
             Click on the map to automatically fill in the coordinates.
           </p>
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              if (!e.target.files || e.target.files.length === 0) return
+          <div className="mt-4">
+            <label className="mb-2 block font-medium text-gray-800">
+              Study Spot Photo
+            </label>
 
-              setImage(e.target.files[0])
-            }}
-          />
+            <label
+              htmlFor="spot-image"
+              className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center transition hover:border-[#ff9e00] hover:bg-orange-50"
+            >
+              <span className="text-3xl">📷</span>
+              <span className="text-sm font-medium text-gray-700">
+                {image ? image.name : 'Click to upload a photo'}
+              </span>
+              <span className="text-xs text-gray-400">.png or .jpeg</span>
+            </label>
 
-          {/* Image Preview */}
-          {image && (
-            <div className="mt-4">
-              <p className="mb-2 font-medium text-gray-800">
-                Selected Image
-              </p>
+            <input
+              id="spot-image"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                if (!e.target.files || e.target.files.length === 0) return
+                setImage(e.target.files[0])
+              }}
+            />
 
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Study Spot Preview"
-                className="h-56 w-full rounded-lg border object-cover shadow"
-              />
-            </div>
-          )}
+            {image && (
+              <div className="relative mt-4">
+                <p className="mb-2 font-medium text-gray-800">Image Preview:</p>
+
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="Study Spot Preview"
+                  className="h-72 w-full rounded-lg border object-cover shadow"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setImage(null)}
+                  className="absolute right-2 top-8 rounded-full bg-black/60 px-2 py-1 text-xs text-white transition hover:bg-black/80"
+                >
+                  ✕  Remove
+                </button>
+              </div>
+            )}
+          </div>
 
         </div>
       </div>
