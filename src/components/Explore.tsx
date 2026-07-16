@@ -17,6 +17,8 @@ type StudySpot = {
 
   x_coord: number
   y_coord: number
+
+  images: string[]
 } //creates object of studyspot
 
 function Explore() {
@@ -24,23 +26,74 @@ function Explore() {
   const [search, setSearch] = useState('')
   //without useState, component wont rerender after fetching data, so spots will be empty array and nothing will show up on explore page
 
-    const navigate = useNavigate() //the function that allows me to move between webpages
+  const navigate = useNavigate() //the function that allows me to move between webpages
+
+  // useEffect(() => { //useEffect runs when the component appears first
+  //   const fetchSpots = async () => {
+  //     const { data, error } = await supabase
+  //       .from('studyspots')
+  //       .select('*') //sql query
+      
+  //     const { data: imageRows, error: imgError } = await supabase
+  //       .from("studyspot_images")
+  //       .select("*")
+  //       .order("display_order")
+
+  //     if (error || imgError) {
+  //       console.error('Error fetching spots:', error) //might fail bc network error
+  //     } else {
+  //       setSpots(data ?? []) //action to update state var
+  //     }
+  //   }
+
+
+
+  //   fetchSpots()
+  // }, [])
 
   useEffect(() => { //useEffect runs when the component appears first
     const fetchSpots = async () => {
-      const { data, error } = await supabase
-        .from('studyspots')
-        .select('*') //sql query
 
-      if (error) {
-        console.error('Error fetching spots:', error) //might fail bc network error
-      } else {
-        setSpots(data ?? []) //action to update state var
+      const { data, error } = await supabase
+        .from("studyspots")
+        .select("*") //sql query to get info about studyspots
+
+      const { data: imageRows, error: imgError } = await supabase
+        .from("studyspot_images")
+        .select("*")
+        .order("display_order") //sql query to get info about images (in order)
+
+      if (error || imgError) {
+        console.error(error || imgError)
+        return
       }
+
+      const spotsWithImages = (data ?? []).map((spot) => {
+
+        const images = (imageRows ?? [])
+          .filter((img) => img.studyspot_id === spot.id)
+          .map((img) =>
+            supabase.storage
+              .from("studyspot-img")
+              .getPublicUrl(img.img_path)
+              .data.publicUrl
+          )
+
+        return {
+          ...spot,
+          images,
+        }
+
+      })
+
+      setSpots(spotsWithImages)
+
     }
 
     fetchSpots()
   }, [])
+
+
 
   // const searchedSpots = spots.filter((spot) =>
   //   spot.name.toLowerCase().includes(search.toLowerCase())
@@ -53,41 +106,14 @@ function Explore() {
   const [selectedSpotImages, setSelectedSpotImages] = useState<string[]>([])
   const [currentImage, setCurrentImage] = useState(0)
 
-  const openSpot = async (spot: StudySpot) => {
+  
 
-    // Opens the modal
-    setSelectedSpot(spot)
+  const openSpot = (spot: StudySpot) => {
 
-    // Reset image carousel
-    setCurrentImage(0)
+      setCurrentImage(0)
 
-    // Fetch images for this spot
-    const { data, error } = await supabase
-      .from("studyspot_images")
-      .select("img_path")
-      .eq("studyspot_id", spot.id)
-      .order("display_order")
+      setSelectedSpot(spot)
 
-    if (error) {
-      console.error(error)
-      return
-    }
-
-    console.log("Study spot:", spot.id)
-
-    console.log("Image rows:", data)
-    
-
-    const urls = (data ?? []).map((image) =>
-      supabase.storage
-        .from("studyspot-img")
-        .getPublicUrl(image.img_path)
-        .data.publicUrl
-    )
-
-    console.log("URLs:", urls)
-
-    setSelectedSpotImages(urls)
   }
 
   const [showFilters, setShowFilters] = useState(false)
@@ -250,7 +276,7 @@ function Explore() {
                onClick={() => openSpot(spot)}>
               
             <img
-              src={placeholder}
+              src={spot.images[0] || placeholder}
               alt={spot.name}
               className="w-full h-48 object-cover"
             />
@@ -316,23 +342,11 @@ function Explore() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
 
-            {selectedSpotImages.length > 0 ? (
-                <img
-                  src={selectedSpotImages[currentImage]}
-                  alt={selectedSpot.name}
-                  className="mb-4 h-64 w-full rounded-lg object-cover"
-                />
-
-              ) : (
-
-                <img
-                  src={placeholder}
-                  alt="No image"
-                  className="mb-4 h-64 w-full rounded-lg object-cover"
-                />
-
-              )}
-
+            <img
+              src={selectedSpot.images[0] || placeholder}
+              alt={selectedSpot.name}
+              className="w-full h-48 object-cover"
+            />
 
             <h2 className="text-xl font-semibold text-gray-900">{selectedSpot.name}</h2>
             <p className="mt-2 text-gray-600">{selectedSpot.location}</p>
