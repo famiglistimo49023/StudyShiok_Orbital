@@ -431,22 +431,6 @@ const Suggest: React.FC = () => {
               <StarRating rating={rating} setRating={setRating} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                className="rounded-xl border border-gray-300 px-4 py-3 shadow-sm"
-                placeholder="X Coordinate"
-                value={xCoord ?? ''}
-                readOnly
-              />
-
-              <input
-                className="rounded-xl border border-gray-300 px-4 py-3 shadow-sm"
-                placeholder="Y Coordinate"
-                value={yCoord ?? ''}
-                readOnly
-              />
-            </div>
-
             {error && (
               <p className="rounded-lg bg-red-100 px-4 py-2 text-sm text-red-700">
                 {error}
@@ -503,6 +487,23 @@ const Suggest: React.FC = () => {
             Click on the map to automatically fill in the coordinates.
           </p>
 
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <input
+              className="rounded-xl border border-gray-300 px-4 py-3 shadow-sm text-gray-800"
+              placeholder="X Coordinate"
+              value={xCoord ?? ''}
+              readOnly
+            />
+
+            <input
+              className="rounded-xl border border-gray-300 px-4 py-3 shadow-sm text-gray-800"
+              placeholder="Y Coordinate"
+              value={yCoord ?? ''}
+              readOnly
+            />
+          </div>
+
+
           <div className="mt-4">
             <label className="mb-2 block font-medium text-gray-800">
               Study Spot Photo
@@ -531,7 +532,7 @@ const Suggest: React.FC = () => {
             />
 
             {image && (
-              <div className="relative mt-4">
+              <div className="relative mt-4"> 
                 <p className="mb-2 font-medium text-gray-800">Image Preview:</p>
 
                 <img

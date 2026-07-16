@@ -49,6 +49,47 @@ function Explore() {
   //depending on the selected spot, modal can show diff info
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
 
+  //for images (since its a seperate table)
+  const [selectedSpotImages, setSelectedSpotImages] = useState<string[]>([])
+  const [currentImage, setCurrentImage] = useState(0)
+
+  const openSpot = async (spot: StudySpot) => {
+
+    // Opens the modal
+    setSelectedSpot(spot)
+
+    // Reset image carousel
+    setCurrentImage(0)
+
+    // Fetch images for this spot
+    const { data, error } = await supabase
+      .from("studyspot_images")
+      .select("img_path")
+      .eq("studyspot_id", spot.id)
+      .order("display_order")
+
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    console.log("Study spot:", spot.id)
+
+    console.log("Image rows:", data)
+    
+
+    const urls = (data ?? []).map((image) =>
+      supabase.storage
+        .from("studyspot-img")
+        .getPublicUrl(image.img_path)
+        .data.publicUrl
+    )
+
+    console.log("URLs:", urls)
+
+    setSelectedSpotImages(urls)
+  }
+
   const [showFilters, setShowFilters] = useState(false)
 
   const [minRating, setMinRating] = useState(0)
@@ -206,7 +247,7 @@ function Explore() {
 
           <div key={spot.id} 
                className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg cursor-pointer" 
-               onClick={() => setSelectedSpot(spot)}>
+               onClick={() => openSpot(spot)}>
               
             <img
               src={placeholder}
@@ -274,6 +315,25 @@ function Explore() {
       {selectedSpot && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+
+            {selectedSpotImages.length > 0 ? (
+                <img
+                  src={selectedSpotImages[currentImage]}
+                  alt={selectedSpot.name}
+                  className="mb-4 h-64 w-full rounded-lg object-cover"
+                />
+
+              ) : (
+
+                <img
+                  src={placeholder}
+                  alt="No image"
+                  className="mb-4 h-64 w-full rounded-lg object-cover"
+                />
+
+              )}
+
+
             <h2 className="text-xl font-semibold text-gray-900">{selectedSpot.name}</h2>
             <p className="mt-2 text-gray-600">{selectedSpot.location}</p>
             <p className="mt-2 text-gray-600">Rating: {selectedSpot.rating}</p>
