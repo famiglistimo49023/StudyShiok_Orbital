@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { supabase } from '../supabase'
 
-import placeholder from '../assets/placeholder.png'
+import placeholder from '../assets/placeholder.png' //placeholder image (very obvious)
 
-type StudySpot = {
+type StudySpot = { //creates object of studyspot
   id: number
   name: string
   location: string
@@ -18,8 +18,8 @@ type StudySpot = {
   x_coord: number
   y_coord: number
 
-  images: string[]
-} //creates object of studyspot
+  images: string[] //take note i dont need a images column in my database to have this object, dont get confused!!
+} 
 
 function Explore() {
   const [spots, setSpots] = useState<StudySpot[]>([]) //initialstate should be ntg 
@@ -28,28 +28,8 @@ function Explore() {
 
   const navigate = useNavigate() //the function that allows me to move between webpages
 
-  // useEffect(() => { //useEffect runs when the component appears first
-  //   const fetchSpots = async () => {
-  //     const { data, error } = await supabase
-  //       .from('studyspots')
-  //       .select('*') //sql query
-      
-  //     const { data: imageRows, error: imgError } = await supabase
-  //       .from("studyspot_images")
-  //       .select("*")
-  //       .order("display_order")
+  const [displayName, setDisplayName] = useState("")
 
-  //     if (error || imgError) {
-  //       console.error('Error fetching spots:', error) //might fail bc network error
-  //     } else {
-  //       setSpots(data ?? []) //action to update state var
-  //     }
-  //   }
-
-
-
-  //   fetchSpots()
-  // }, [])
 
   useEffect(() => { //useEffect runs when the component appears first
     const fetchSpots = async () => {
@@ -63,7 +43,7 @@ function Explore() {
         .select("*")
         .order("display_order") //sql query to get info about images (in order)
 
-      if (error || imgError) {
+      if (error || imgError) { //checking for both errors
         console.error(error || imgError)
         return
       }
@@ -91,13 +71,30 @@ function Explore() {
     }
 
     fetchSpots()
+
+
+    const fetchUser = async () => {
+
+      const { data: authData } = await supabase.auth.getUser()
+
+      if (!authData.user) return
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", authData.user.id)
+        .single()
+
+      if (data) {
+        setDisplayName(data.display_name)
+      }
+    }
+
+    fetchUser()
+
+    
   }, [])
 
-
-
-  // const searchedSpots = spots.filter((spot) =>
-  //   spot.name.toLowerCase().includes(search.toLowerCase())
-  // ) //search filter, no need to press enter to search
 
   //depending on the selected spot, modal can show diff info
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
@@ -161,7 +158,7 @@ function Explore() {
     return (matchesSearch && matchesRating && matchesBusyness && matchesWifi && matchesAmbience && matchesFood)
   })
 
-  return (
+  return ( //frontend code on navbar
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
 
       <div className="flex items-center justify-between border-b border-gray-200 px-8 py-4">
@@ -206,7 +203,7 @@ function Explore() {
       </div>
 
       <h1 className="mt-8 text-4xl font-bold tracking-tight text-[#ffb703]">
-        Welcome to Explore
+        Welcome, {displayName || 'User'}!
       </h1>
 
       <p className="mt-2 text-gray-200">
