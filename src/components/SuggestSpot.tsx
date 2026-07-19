@@ -109,7 +109,7 @@ const Suggest: React.FC = () => {
   const [seatingComfort, setSeatingComfort] = useState(0)
 
   //for wifi
-  const [wifiLevel, setWifiLevel] = useState(3)
+  const [wifiLevel, setWifiLevel] = useState(5)
   //since wifi is compulsory, setting default as good wifi
 
 
@@ -301,7 +301,7 @@ const Suggest: React.FC = () => {
                   src={
                     wifiLevel === 1
                       ? redwifi
-                      : wifiLevel === 2
+                      : wifiLevel === 3
                       ? yellowwifi
                       : greenwifi
                   }
@@ -314,8 +314,8 @@ const Suggest: React.FC = () => {
                 <input
                   type="range"
                   min="1"
-                  max="3"
-                  step="1"
+                  max="5"
+                  step="2"
                   value={wifiLevel}
                   onChange={(e) => setWifiLevel(Number(e.target.value))}
                   className="
