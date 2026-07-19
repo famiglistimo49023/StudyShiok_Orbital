@@ -5,15 +5,33 @@ import { supabase } from '../supabase'
 
 import placeholder from '../assets/placeholder.png' //placeholder image (very obvious)
 
+import ProgressBar from '../assets/ProgressBar' //progress bar component
+
 type StudySpot = { //creates object of studyspot
   id: number
   name: string
   location: string
   rating: number
   busyness: string
+
   wifi_level: number
   ambience_level: number
   food_available: boolean
+
+  //ambience rating
+  quietness: number
+  lighting: number
+  cleanliness: number
+  seatingComfort: number
+
+  //amenities rating
+  power_outlets: boolean
+  air_conditioning: boolean
+  food_nearby: boolean
+  group_friendly: boolean
+  open_late: boolean
+
+  //then overall is calculated by averaging
 
   x_coord: number
   y_coord: number
@@ -100,17 +118,14 @@ function Explore() {
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
 
   //for images (since its a seperate table)
-  const [selectedSpotImages, setSelectedSpotImages] = useState<string[]>([])
-  const [currentImage, setCurrentImage] = useState(0)
+  //const [selectedSpotImages, setSelectedSpotImages] = useState<string[]>([])
+  //const [currentImage, setCurrentImage] = useState(0)
 
   
 
   const openSpot = (spot: StudySpot) => {
-
-      setCurrentImage(0)
-
+    //when more images are added, this should take the first in stack
       setSelectedSpot(spot)
-
   }
 
   const [showFilters, setShowFilters] = useState(false)
@@ -158,6 +173,49 @@ function Explore() {
     return (matchesSearch && matchesRating && matchesBusyness && matchesWifi && matchesAmbience && matchesFood)
   })
 
+  const wifiStars = (wifi: number) => {
+    switch (wifi) {
+      case 1:
+        return 1     // red
+      case 2:
+        return 3     // yellow
+      case 3:
+        return 5     // green
+      default:
+        return 5
+    }
+  }
+
+  const ambienceStars = (spot: StudySpot) => {
+    return (
+      (
+        spot.quietness +
+        spot.lighting +
+        spot.cleanliness +
+        spot.seatingComfort
+      ) / 4
+    )
+  }
+
+  const amenitiesStars = (spot: StudySpot) => {
+    return [
+      spot.power_outlets,
+      spot.air_conditioning,
+      spot.food_nearby,
+      spot.group_friendly,
+      spot.open_late,
+    ].filter(Boolean).length
+  }
+
+  const overallStars = (spot: StudySpot) => {
+    const wifi = wifiStars(spot.wifi_level)
+    const ambience = ambienceStars(spot)
+    const amenities = amenitiesStars(spot)
+
+    return (wifi + ambience + amenities) / 3
+  }
+
+
   return ( //frontend code on navbar
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
 
@@ -203,8 +261,8 @@ function Explore() {
       </div>
 
       <h1 className="mt-8 text-4xl font-bold tracking-tight text-[#ffb703]">
-        Welcome, {displayName || 'User'}!
-      </h1>
+        Welcome, {displayName || 'User'}!  {/* all that code for this one line */}
+      </h1> 
 
       <p className="mt-2 text-gray-200">
         Study spots near you, for you.
@@ -238,14 +296,6 @@ function Explore() {
             className="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-24 
             shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-
-          {/* <button
-            type="button"
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg 
-            bg-[#ff9e00] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#ffb703]"
-          >
-            Search
-          </button> */}
 
         </div>
 
@@ -306,18 +356,18 @@ function Explore() {
               ${spot.wifi_level >= 3 ? 'bg-green-500' 
                 : spot.wifi_level === 2 ? 'bg-yellow-400' 
                 : 'bg-red-500'}`}> 
-            {/* 3 -> green, 2 -> yellow, 1 -> red */}
+            {/* 3 is green, 2 is yellow, 1 red */}
               📶
             </div>
 
-            {/* Ambience — green if >= 3, yellow if 2, red if <= 1 */}
+            {/* Ambience: green if 3, yellow if 2, red if 1 */}
             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
               ${spot.ambience_level >= 3 ? 'bg-green-500' : spot.ambience_level === 2 ? 'bg-yellow-400' : 'bg-red-500'}`}
             >
               🔇
             </div>
 
-            {/* Food — green if available, red if not */}
+            {/* Food: green if available, red if no */}
             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
               ${spot.food_available ? 'bg-green-500' : 'bg-red-500'}`}
             >
@@ -347,11 +397,34 @@ function Explore() {
 
             <h2 className="text-xl font-semibold text-gray-900">{selectedSpot.name}</h2>
             <p className="mt-2 text-gray-600">{selectedSpot.location}</p>
-            <p className="mt-2 text-gray-600">Rating: {selectedSpot.rating}</p>
-            <p className="mt-2 text-gray-600">Busyness: {selectedSpot.busyness}</p>
-            <p className="mt-2 text-gray-600">WiFi Level: {selectedSpot.wifi_level}</p>
-            <p className="mt-2 text-gray-600">Ambience Level: {selectedSpot.ambience_level}</p>
-            <p className="mt-2 text-gray-600">Food Available: {selectedSpot.food_available ? 'Yes' : 'No'}</p>
+
+            <div className="mt-6 grid grid-cols-2 gap-4">
+
+              <ProgressBar
+                label="Wi-Fi"
+                value={wifiStars(selectedSpot.wifi_level)}
+              />
+
+              <ProgressBar
+                label="Ambience"
+                value={ambienceStars(selectedSpot)}
+              />
+
+              <ProgressBar
+                label="Amenities"
+                value={amenitiesStars(selectedSpot)}
+              />
+
+              <ProgressBar
+                label="Overall"
+                value={overallStars(selectedSpot)}
+              />
+
+            </div>
+
+            {/* <p className="mt-4 text-gray-600">
+              Busyness: {selectedSpot.busyness}
+            </p> */}
             <div className="mt-4 flex justify-end">
               <button
                 className="rounded-lg bg-[#ff9e00] px-4 py-2 font-medium text-white transition hover:bg-[#ffb703]"
