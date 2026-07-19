@@ -6,39 +6,61 @@ import { supabase } from '../supabase'
 const Dashboard: React.FC = () => {
   const navigate = useNavigate()
 
+  const [bookmarkedSpots, setBookmarkedSpots] = useState<any[]>([])
+  
+  //trying to link to supabase
+  const [stats, setStats] = useState({
+  bookmarkedCount: 0,
+  ratingsGiven: 0,
+  avgRating: 0,
+  notBusySpots: 0
+  })
+
   useEffect(() => {
   const fetchData = async () => {
-    const { data: userData } = await supabase.auth.getUser()
-    if (!userData?.user) return
+    const { data: userData, error: userError} = await supabase.auth.getUser()
+    if (userError || !userData?.user) {
+  console.error("Auth Error:", userError)
+  return
+}
 
     const userId = userData.user.id
 
     // bookmarks
-    const { data: bookmarks } = await supabase
+    const { data: bookmarks, error: bookmarksError } = await supabase
       .from('bookmarks')
       .select('studyspot_id')
       .eq('user_id', userId)
-
+    if (bookmarksError) {
+      console.error("Bookmarks Fetch Error:", bookmarksError.message)
+    }
     // ratings
-    const { data: ratings } = await supabase
+    const { data: ratings, error: ratingsError } = await supabase
       .from('ratings')
       .select('rating')
       .eq('user_id', userId)
+
+    if (ratingsError) {
+      console.error("Ratings Fetch Error:", ratingsError.message)
+    }
     
-    const { data: spots } = await supabase
+    const { data: spots, error: spotsError } = await supabase
       .from('bookmarks')
       .select(`
-    studyspot_id,
-    studyspots (
-      id,
-      name,
-      campusArea,
-      rating,
-      busyness
-    )
-  `)
+        studyspot_id,
+        studyspots (
+        id,
+        name,
+        location,
+        rating,
+        busyness
+      )
+    `)
   .eq('user_id', userId)
 
+    if (spotsError) {
+      console.error("Detailed Spots Fetch Error:", spotsError.message)
+    }
 setBookmarkedSpots(spots || [])
     const avg =
       ratings && ratings.length > 0
@@ -55,16 +77,9 @@ setBookmarkedSpots(spots || [])
 
   fetchData()
 }, [])
-  //trying to link to supabase
-  const [stats, setStats] = useState({
-  bookmarkedCount: 0,
-  ratingsGiven: 0,
-  avgRating: 0,
-  notBusySpots: 0
-  })
+  
 
   //hardcoded for now
-  const [bookmarkedSpots, setBookmarkedSpots] = useState<any[]>([])
 
   return (
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
