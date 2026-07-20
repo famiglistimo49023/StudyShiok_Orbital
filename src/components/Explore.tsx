@@ -7,6 +7,8 @@ import placeholder from '../assets/images/placeholder.png' //placeholder image (
 
 import ProgressBar from '../assets/ProgressBar' //progress bar component
 
+import StudySpotMap from '../assets/StudySpotMap' //map component
+
 type Rating = {//stores rating for a particular studyspot
   rating: number
 
@@ -413,6 +415,13 @@ function Explore() {
               {/* left side of the modal */}
 
               <div>
+
+                  <div className="mb-5 h-64 overflow-hidden rounded-xl border">
+                    <StudySpotMap
+                      spots={spots}
+                      selectedSpot={selectedSpot} 
+                    />
+                  </div>
 
                 <img
                   src={selectedSpot.images[0] || placeholder}
