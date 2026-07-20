@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
 import { supabase } from '../supabase'
-import logo from '../assets/logo_blank.png'
+import logo from '../assets/images/logo_blank.png'
 
 function Register() {
   const [email, setEmail] = useState('')

@@ -4,7 +4,7 @@ import { supabase } from '../supabase'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
-import logo from '../assets/logo_blank.png'
+import logo from '../assets/images/logo_blank.png'
 
 import '../App.css'
 

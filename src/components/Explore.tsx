@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { supabase } from '../supabase'
 
-import placeholder from '../assets/placeholder.png' //placeholder image (very obvious)
+import placeholder from '../assets/images/placeholder.png' //placeholder image (very obvious)
 
 import ProgressBar from '../assets/ProgressBar' //progress bar component
 
@@ -58,14 +58,13 @@ function Explore() {
 
       const { data, error: studySpotError } = await supabase
         .from("studyspots")
-        //.select("*") //sql query to get info about studyspots
           .select(`*,
             ratings (rating, wifi_level, 
                         quietness, cleanliness, lighting, seating_comfort,
                         power_outlets, air_conditioning, food_nearby, group_friendly, open_late)`)
 
       if (studySpotError) {
-        console.error(studySpotError)
+        console.error("Study Spot Fetch Error:", studySpotError.message)
         return
       }
 
@@ -78,7 +77,7 @@ function Explore() {
         console.error(studySpotError || imgError)
         return
       }
-
+ 
       const spotsWithImages = (data ?? []).map((spot) => {
 
         const images = (imageRows ?? [])
@@ -130,12 +129,6 @@ function Explore() {
 
   //depending on the selected spot, modal can show diff info
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
-
-  //for images (since its a seperate table)
-  //const [selectedSpotImages, setSelectedSpotImages] = useState<string[]>([])
-  //const [currentImage, setCurrentImage] = useState(0)
-
-  
 
   const openSpot = (spot: StudySpot) => {
     //when more images are added, this should take the first in stack
@@ -233,13 +226,6 @@ function Explore() {
       ambienceLevelFilter === 0 ||
       averageAmbience(spot) >= ambienceLevelFilter
 
-    // const matchesFood =
-    //   foodFilter === 0 ||
-    //   (foodFilter === 1 &&
-    //     spot.food_available) ||
-    //   (foodFilter === 2 &&
-    //     !spot.food_available)
-
     const matchesSearch =
       spot.name.toLowerCase().includes(
         search.toLowerCase()
@@ -247,49 +233,6 @@ function Explore() {
 
     return (matchesSearch && matchesRating && matchesBusyness && matchesWifi && matchesAmbience)
   })
-
-  // const wifiStars = (wifi: number) => {
-  //   switch (wifi) {
-  //     case 1:
-  //       return 1     // red
-  //     case 2:
-  //       return 3     // yellow
-  //     case 3:
-  //       return 5     // green
-  //     default:
-  //       return 5
-  //   }
-  // }
-
-  // const ambienceStars = (spot: StudySpot) => {
-  //   return (
-  //     (
-  //       spot.quietness +
-  //       spot.lighting +
-  //       spot.cleanliness +
-  //       spot.seatingComfort
-  //     ) / 4
-  //   )
-  // }
-
-  // const amenitiesStars = (spot: StudySpot) => {
-  //   return [
-  //     spot.power_outlets,
-  //     spot.air_conditioning,
-  //     spot.food_nearby,
-  //     spot.group_friendly,
-  //     spot.open_late,
-  //   ].filter(Boolean).length
-  // }
-
-  // const overallStars = (spot: StudySpot) => {
-  //   const wifi = wifiStars(spot.wifi_level)
-  //   const ambience = ambienceStars(spot)
-  //   const amenities = amenitiesStars(spot)
-
-  //   return (wifi + ambience + amenities) / 3
-  // }
-
 
   return ( //frontend code on navbar
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
@@ -686,8 +629,8 @@ function Explore() {
                 {[
                   { icon: "Any", value: 0 },
                   { icon: "📶", value: 1 },
-                  { icon: "📶📶", value: 2 },
-                  { icon: "📶📶📶", value: 3 },
+                  { icon: "📶📶", value: 2.5 },
+                  { icon: "📶📶📶", value: 4 },
                 ].map((option) => (
                   <button
                     key={option.value}
@@ -715,8 +658,8 @@ function Explore() {
                 {[
                   { label: "Any", value: 0 },
                   { label: "🔇", value: 1 },
-                  { label: "🔉", value: 2 },
-                  { label: "🔊", value: 3 },
+                  { label: "🔉", value: 2.5 },
+                  { label: "🔊", value: 4 },
                 ].map((option) => (
                   <button
                     key={option.value}

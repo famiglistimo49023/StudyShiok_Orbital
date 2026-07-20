@@ -11,9 +11,9 @@ import {
 } from 'react-leaflet'
 import { supabase } from '../supabase'
 
-import redwifi from '../assets/dog_redwifi.png'
-import yellowwifi from '../assets/dog_yellowwifi.png'
-import greenwifi from '../assets/dog_greenwifi.png' //img for wifi strength indicator
+import redwifi from '../assets/images/dog_redwifi.png'
+import yellowwifi from '../assets/images/dog_yellowwifi.png'
+import greenwifi from '../assets/images/dog_greenwifi.png' //img for wifi strength indicator
 
 type StarRatingProps = {
   rating: number
