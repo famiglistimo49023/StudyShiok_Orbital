@@ -7,6 +7,23 @@ import placeholder from '../assets/placeholder.png' //placeholder image (very ob
 
 import ProgressBar from '../assets/ProgressBar' //progress bar component
 
+type Rating = {//stores rating for a particular studyspot
+  rating: number
+
+  wifi_level: number
+
+  quietness: number
+  cleanliness: number
+  lighting: number
+  seating_comfort: number
+
+  power_outlets: boolean
+  air_conditioning: boolean
+  food_nearby: boolean
+  group_friendly: boolean
+  open_late: boolean
+}
+
 type StudySpot = { //creates object of studyspot
   id: number
   name: string
@@ -14,30 +31,15 @@ type StudySpot = { //creates object of studyspot
   rating: number
   busyness: string
 
-  wifi_level: number
-  ambience_level: number
-  food_available: boolean
-
-  //ambience rating
-  quietness: number
-  lighting: number
-  cleanliness: number
-  seatingComfort: number
-
-  //amenities rating
-  power_outlets: boolean
-  air_conditioning: boolean
-  food_nearby: boolean
-  group_friendly: boolean
-  open_late: boolean
-
-  //then overall is calculated by averaging
-
   x_coord: number
   y_coord: number
 
   images: string[] //take note i dont need a images column in my database to have this object, dont get confused!!
+
+  ratings: Rating[] //stores ratings for this specific studyspot
 } 
+
+
 
 function Explore() {
   const [spots, setSpots] = useState<StudySpot[]>([]) //initialstate should be ntg 
@@ -49,20 +51,31 @@ function Explore() {
   const [displayName, setDisplayName] = useState("")
 
 
+
+
   useEffect(() => { //useEffect runs when the component appears first
     const fetchSpots = async () => {
 
-      const { data, error } = await supabase
+      const { data, error: studySpotError } = await supabase
         .from("studyspots")
-        .select("*") //sql query to get info about studyspots
+        //.select("*") //sql query to get info about studyspots
+          .select(`*,
+            ratings (rating, wifi_level, 
+                        quietness, cleanliness, lighting, seating_comfort,
+                        power_outlets, air_conditioning, food_nearby, group_friendly, open_late)`)
+
+      if (studySpotError) {
+        console.error(studySpotError)
+        return
+      }
 
       const { data: imageRows, error: imgError } = await supabase
         .from("studyspot_images")
         .select("*")
         .order("display_order") //sql query to get info about images (in order)
 
-      if (error || imgError) { //checking for both errors
-        console.error(error || imgError)
+      if (studySpotError || imgError) { //checking for both errors
+        console.error(studySpotError || imgError)
         return
       }
 
@@ -85,6 +98,7 @@ function Explore() {
       })
 
       setSpots(spotsWithImages)
+      console.log(data)
 
     }
 
@@ -128,6 +142,67 @@ function Explore() {
       setSelectedSpot(spot)
   }
 
+  const averageRating = (spot: StudySpot) => {
+
+      if (spot.ratings.length === 0)
+          return 0
+
+      return (
+          spot.ratings.reduce(
+              (sum, rating) => sum + rating.rating,
+              0
+          ) / spot.ratings.length
+      )
+  } 
+
+  const averageWifi = (spot: StudySpot) => {
+
+      if (spot.ratings.length === 0)
+          return 0
+
+      return (
+          spot.ratings.reduce(
+              (sum, rating) => sum + rating.wifi_level,
+              0
+          ) / spot.ratings.length
+      )
+  }
+
+    const averageAmbience = (spot: StudySpot) => {
+
+        if (spot.ratings.length === 0)
+            return 0
+
+        return (
+            spot.ratings.reduce(
+                (sum, rating) => sum + ((rating.quietness + rating.lighting + 
+                                          rating.cleanliness + rating.seating_comfort) / 4),
+                0
+            ) / spot.ratings.length
+        )
+    }
+
+    const averageAmenities = (spot: StudySpot) => {
+      
+        if (spot.ratings.length === 0)
+            return 0
+
+        return (
+            spot.ratings.reduce(
+                (sum, rating) => sum + [
+                    rating.power_outlets,
+                    rating.air_conditioning,
+                    rating.food_nearby,
+                    rating.group_friendly,
+                    rating.open_late
+                ].filter(Boolean).length,
+                0
+            ) / spot.ratings.length
+        )
+    }
+
+
+
   const [showFilters, setShowFilters] = useState(false)
 
   const [minRating, setMinRating] = useState(0)
@@ -139,7 +214,7 @@ function Explore() {
   const filteredSpots = spots.filter((spot) => {
 
     const matchesRating =
-      spot.rating >= minRating
+      averageRating(spot) >= minRating
 
     const matchesBusyness =
       busynessFilter === 0 ||
@@ -152,68 +227,68 @@ function Explore() {
 
     const matchesWifi =
       wifiLevelFilter === 0 ||
-      spot.wifi_level >= wifiLevelFilter
+      averageWifi(spot) >= wifiLevelFilter
 
     const matchesAmbience =
       ambienceLevelFilter === 0 ||
-      spot.ambience_level >= ambienceLevelFilter
+      averageAmbience(spot) >= ambienceLevelFilter
 
-    const matchesFood =
-      foodFilter === 0 ||
-      (foodFilter === 1 &&
-        spot.food_available) ||
-      (foodFilter === 2 &&
-        !spot.food_available)
+    // const matchesFood =
+    //   foodFilter === 0 ||
+    //   (foodFilter === 1 &&
+    //     spot.food_available) ||
+    //   (foodFilter === 2 &&
+    //     !spot.food_available)
 
     const matchesSearch =
       spot.name.toLowerCase().includes(
         search.toLowerCase()
     )
 
-    return (matchesSearch && matchesRating && matchesBusyness && matchesWifi && matchesAmbience && matchesFood)
+    return (matchesSearch && matchesRating && matchesBusyness && matchesWifi && matchesAmbience)
   })
 
-  const wifiStars = (wifi: number) => {
-    switch (wifi) {
-      case 1:
-        return 1     // red
-      case 2:
-        return 3     // yellow
-      case 3:
-        return 5     // green
-      default:
-        return 5
-    }
-  }
+  // const wifiStars = (wifi: number) => {
+  //   switch (wifi) {
+  //     case 1:
+  //       return 1     // red
+  //     case 2:
+  //       return 3     // yellow
+  //     case 3:
+  //       return 5     // green
+  //     default:
+  //       return 5
+  //   }
+  // }
 
-  const ambienceStars = (spot: StudySpot) => {
-    return (
-      (
-        spot.quietness +
-        spot.lighting +
-        spot.cleanliness +
-        spot.seatingComfort
-      ) / 4
-    )
-  }
+  // const ambienceStars = (spot: StudySpot) => {
+  //   return (
+  //     (
+  //       spot.quietness +
+  //       spot.lighting +
+  //       spot.cleanliness +
+  //       spot.seatingComfort
+  //     ) / 4
+  //   )
+  // }
 
-  const amenitiesStars = (spot: StudySpot) => {
-    return [
-      spot.power_outlets,
-      spot.air_conditioning,
-      spot.food_nearby,
-      spot.group_friendly,
-      spot.open_late,
-    ].filter(Boolean).length
-  }
+  // const amenitiesStars = (spot: StudySpot) => {
+  //   return [
+  //     spot.power_outlets,
+  //     spot.air_conditioning,
+  //     spot.food_nearby,
+  //     spot.group_friendly,
+  //     spot.open_late,
+  //   ].filter(Boolean).length
+  // }
 
-  const overallStars = (spot: StudySpot) => {
-    const wifi = wifiStars(spot.wifi_level)
-    const ambience = ambienceStars(spot)
-    const amenities = amenitiesStars(spot)
+  // const overallStars = (spot: StudySpot) => {
+  //   const wifi = wifiStars(spot.wifi_level)
+  //   const ambience = ambienceStars(spot)
+  //   const amenities = amenitiesStars(spot)
 
-    return (wifi + ambience + amenities) / 3
-  }
+  //   return (wifi + ambience + amenities) / 3
+  // }
 
 
   return ( //frontend code on navbar
@@ -336,7 +411,7 @@ function Explore() {
                 <h3 className="mt-2 text-lg font-semibold text-gray-900">{spot.name}</h3>
                 <div className="flex items-center gap-0.5">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <span key={star} className={`text-xl ${star <= Math.round(spot.rating) ? 'text-yellow-600' : 'text-gray-200'}`}>
+                    <span key={star} className={`text-xl ${star <= Math.round(averageRating(spot)) ? 'text-yellow-600' : 'text-gray-200'}`}>
                       ★
                     </span>
                   ))}
@@ -353,26 +428,26 @@ function Explore() {
 
             {/* wifi icon */}
             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
-              ${spot.wifi_level >= 3 ? 'bg-green-500' 
-                : spot.wifi_level === 2 ? 'bg-yellow-400' 
+              ${averageWifi(spot) >= 4 ? 'bg-green-500' 
+                : averageWifi(spot) >= 2.5 ? 'bg-yellow-400' 
                 : 'bg-red-500'}`}> 
-            {/* 3 is green, 2 is yellow, 1 red */}
+            {/* 4 is green, 2.5 is yellow, 1 red */}
               📶
             </div>
 
-            {/* Ambience: green if 3, yellow if 2, red if 1 */}
+            {/* Ambience: green, yellow, red format */}
             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
-              ${spot.ambience_level >= 3 ? 'bg-green-500' : spot.ambience_level === 2 ? 'bg-yellow-400' : 'bg-red-500'}`}
+              ${averageAmbience(spot) >= 4 ? 'bg-green-500' : averageAmbience(spot) >= 2.5 ? 'bg-yellow-400' : 'bg-red-500'}`}
             >
               🔇
             </div>
 
             {/* Food: green if available, red if no */}
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
+            {/* <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
               ${spot.food_available ? 'bg-green-500' : 'bg-red-500'}`}
             >
               🍴
-            </div>
+            </div> */}
 
           </div>
 
@@ -384,60 +459,153 @@ function Explore() {
         ))}
       </div>
 
-    
+      {/* The modal for the study spot (what is shown when clicked) */}      
       {selectedSpot && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 
-            <img
-              src={selectedSpot.images[0] || placeholder}
-              alt={selectedSpot.name}
-              className="w-full h-48 object-cover"
-            />
+          <div className="w-[1100px] rounded-2xl bg-white p-8 shadow-2xl">
 
-            <h2 className="text-xl font-semibold text-gray-900">{selectedSpot.name}</h2>
-            <p className="mt-2 text-gray-600">{selectedSpot.location}</p>
+            <div className="grid grid-cols-2 gap-8">
 
-            <div className="mt-6 grid grid-cols-2 gap-4">
+              {/* left side of the modal */}
 
-              <ProgressBar
-                label="Wi-Fi"
-                value={wifiStars(selectedSpot.wifi_level)}
-              />
+              <div>
 
-              <ProgressBar
-                label="Ambience"
-                value={ambienceStars(selectedSpot)}
-              />
+                <img
+                  src={selectedSpot.images[0] || placeholder}
+                  alt={selectedSpot.name}
+                  className="h-80 w-full rounded-xl object-cover"
+                />
 
-              <ProgressBar
-                label="Amenities"
-                value={amenitiesStars(selectedSpot)}
-              />
+                <h2 className="mt-5 text-3xl font-bold text-gray-900">
+                  {selectedSpot.name}
+                </h2>
 
-              <ProgressBar
-                label="Overall"
-                value={overallStars(selectedSpot)}
-              />
+                <p className="mt-2 text-lg text-gray-600">
+                  {selectedSpot.location}
+                </p>
+
+              </div>
+
+              {/* right side */}
+
+              <div className="flex flex-col justify-between">
+
+                <div>
+
+                  <h3 className="mb-4 text-xl font-semibold">
+                    Study Spot Ratings
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-6">
+
+                    <ProgressBar
+                      label="Wi-Fi"
+                      value={averageWifi(selectedSpot)}
+                    />
+
+                    <ProgressBar
+                      label="Ambience"
+                      value={averageAmbience(selectedSpot)}
+                    />
+
+                    <ProgressBar
+                      label="Amenities"
+                      value={averageAmenities(selectedSpot)}
+                    />
+
+                    <ProgressBar
+                      label="Overall"
+                      value={averageRating(selectedSpot)}
+                    />
+
+                  </div>
+
+                </div>
+
+                {/* comments section - hardcoded for now */}
+
+                <div className="mt-8">
+
+                  <h3 className="mb-3 text-xl font-semibold">
+                    Reviews
+                  </h3>
+
+                  <div className="h-64 space-y-3 overflow-y-auto rounded-xl border bg-gray-50 p-4">
+
+                    <div className="rounded-lg bg-white p-3 shadow-sm">
+                      <p className="font-semibold">
+                        John Tan
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        ★★★★★ Great place to study after lectures.
+                        Plenty of charging ports and very quiet.
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg bg-white p-3 shadow-sm">
+                      <p className="font-semibold">
+                        Sarah Lim
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        ★★★★☆ Wi-Fi is excellent but seats fill up
+                        quickly during exam season.
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg bg-white p-3 shadow-sm">
+                      <p className="font-semibold">
+                        Marcus Lee
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        ★★★★★ Definitely one of my favourite study
+                        spots on campus.
+                      </p>
+                    </div>
+
+                  </div>
+
+                  <div className="mt-4 flex gap-3">
+
+                    <input
+                      type="text"
+                      placeholder="Leave a review..."
+                      className="flex-1 rounded-lg border px-4 py-3"
+                    />
+
+                    <button
+                      className="rounded-lg bg-[#ff9e00] px-5 text-white hover:bg-[#ffb703]"
+                    >
+                      Post
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
 
             </div>
 
-            {/* <p className="mt-4 text-gray-600">
-              Busyness: {selectedSpot.busyness}
-            </p> */}
-            <div className="mt-4 flex justify-end">
+            {/* Bottom buttons */}
+
+            <div className="mt-8 flex justify-end">
+
               <button
-                className="rounded-lg bg-[#ff9e00] px-4 py-2 font-medium text-white transition hover:bg-[#ffb703]"
+                className="rounded-lg bg-[#ff9e00] px-5 py-2 text-white hover:bg-[#ffb703]"
                 onClick={() => setSelectedSpot(null)}
               >
                 Close
               </button>
+
             </div>
+
           </div>
+
         </div>
       )}
 
-
+      {/* The actual cards for the study spots*/}
       {showFilters && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 

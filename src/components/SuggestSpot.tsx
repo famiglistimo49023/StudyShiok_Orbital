@@ -168,24 +168,60 @@ const Suggest: React.FC = () => {
     const { data: studySpot, error : formError } = await supabase //saving data as studySpot to save studySpot.id
       .from('studyspots')
       .insert({
-        name, location, rating,
+        name, location, 
+        // quietness,
+        // cleanliness,
+        // lighting,
+        // seatingComfort,
+        // wifi_level: wifiLevel,
+
+        // power_outlets: powerOutlets,
+        // air_conditioning: airConditioning,
+        // food_nearby: foodNearby,
+        // group_friendly: groupFriendly,
+        // open_late: openLate,
+        x_coord: xCoord,
+        y_coord: yCoord,
+
+        //busyness default for now
+        busyness: 'Free'
+      }).select().single() //only saves studySpot.id, faster
+
+    if (formError) {
+      console.error('Error submitting study spot:', formError)
+      setError('Unable to submit study spot. Please try again.')
+      setIsSubmitting(false)
+      return
+    }
+
+    const { error: ratingError } = await supabase
+      .from("ratings")
+      .insert({
+        studyspot_id: studySpot.id,
+        user_id: authData.user.id,
+
+        rating,
+
+        wifi_level: wifiLevel,
+
         quietness,
         cleanliness,
         lighting,
-        seatingComfort,
-        wifi_level: wifiLevel,
+        seating_comfort: seatingComfort,
 
         power_outlets: powerOutlets,
         air_conditioning: airConditioning,
         food_nearby: foodNearby,
         group_friendly: groupFriendly,
         open_late: openLate,
-        x_coord: xCoord,
-        y_coord: yCoord,
+      })
 
-        //busyness default for now
-        busyness: 'Free'
-    }).select().single() //only saves studySpot.id, faster
+    if (ratingError) {
+      console.error('Error submitting rating:', ratingError)
+      setError('Unable to submit rating. Please try again.')
+      setIsSubmitting(false)
+      return
+    }
 
     if (image) {
       const extension = image.name.split('.').pop()
@@ -202,13 +238,6 @@ const Suggest: React.FC = () => {
           setError("Failed to upload image.")
           setIsSubmitting(false)
           return
-      }
-
-      if (formError) {
-        console.error('Error submitting study spot:', formError)
-        setError('Unable to submit study spot. Please try again.')
-        setIsSubmitting(false)
-        return
       }
 
       const { error: imageError } = await supabase
