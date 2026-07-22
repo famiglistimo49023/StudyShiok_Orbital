@@ -128,9 +128,17 @@ function Explore() {
     
   }, [])
 
-
   //depending on the selected spot, modal can show diff info
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)
+
+  //fetch all the reviews whenever a modal opens
+  useEffect(() => {
+
+    if (!selectedSpot) return
+
+    fetchReviews()
+
+  }, [selectedSpot])
 
   const openSpot = (spot: StudySpot) => {
     //when more images are added, this should take the first in stack
@@ -235,6 +243,60 @@ function Explore() {
 
     return (matchesSearch && matchesRating && matchesBusyness && matchesWifi && matchesAmbience)
   })
+
+  const [reviews, setReviews] = useState<any[]>([])
+  const [reviewInput, setReviewInput] = useState("")
+  const [loadingReviews, setLoadingReviews] = useState(false)
+
+  const fetchReviews = async () => {
+
+    if (!selectedSpot) return
+
+    setLoadingReviews(true)
+
+    const { data, error } = await supabase
+      .from("reviews")
+      .select(`id, user_id, content`)
+      .eq("studyspot_id", selectedSpot.id)
+      .order("id", { ascending: false })
+
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    setReviews(data ?? [])
+
+    setLoadingReviews(false)
+  }
+
+  const handlePostReview = async () => {
+
+    if (!selectedSpot) return
+
+    if (reviewInput.trim() === "") return
+
+    const { data: auth } = await supabase.auth.getUser()
+
+    if (!auth.user) return
+
+    const { error } = await supabase
+      .from("reviews")
+      .insert({
+        user_id: auth.user.id,
+        studyspot_id: selectedSpot.id,
+        content: reviewInput
+      })
+
+    if (!error) {
+
+      setReviewInput("")
+      fetchReviews()
+
+    }
+  }
+
+
 
   return ( //frontend code on navbar
     <div className="bg-[#2D4466] min-h-screen p-8 text-black">
@@ -429,19 +491,15 @@ function Explore() {
                   className="h-80 w-full rounded-xl object-cover"
                 />
 
-                <h2 className="mt-5 text-3xl font-bold text-gray-900">
+                 <h4 className="mt-2 text-xl font-bold text-gray-900">
                   {selectedSpot.name}
-                </h2>
-
-                <p className="mt-2 text-lg text-gray-600">
-                  {selectedSpot.location}
-                </p>
+                </h4>
 
               </div>
 
               {/* right side */}
 
-              <div className="flex flex-col justify-between">
+              <div className="flex flex-col">
 
                 <div>
 
@@ -449,7 +507,7 @@ function Explore() {
                     Study Spot Ratings
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-4 gap-6">
 
                     <ProgressBar
                       label="Wi-Fi"
@@ -475,6 +533,14 @@ function Explore() {
 
                 </div>
 
+                <div className="mt-6 flex justify-center">
+                  <button
+                    className="rounded-lg bg-[#ff9e00] px-8 py-2 font-medium text-white transition hover:bg-[#ffb703]"
+                  >
+                    Review It Yourself
+                  </button>
+                </div>
+
                 {/* comments section - hardcoded for now */}
 
                 <div className="mt-8">
@@ -485,35 +551,36 @@ function Explore() {
 
                   <div className="h-64 space-y-3 overflow-y-auto rounded-xl border bg-gray-50 p-4">
 
-                    <div className="rounded-lg bg-white p-3 shadow-sm">
-                      <p className="font-semibold">
-                        John Tan
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        ★★★★★ Great place to study after lectures.
-                        Plenty of charging ports and very quiet.
-                      </p>
-                    </div>
+                    {loadingReviews ? (
 
-                    <div className="rounded-lg bg-white p-3 shadow-sm">
-                      <p className="font-semibold">
-                        Sarah Lim
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        ★★★★☆ Wi-Fi is excellent but seats fill up
-                        quickly during exam season.
-                      </p>
-                    </div>
+                      <p>Loading...</p>
 
-                    <div className="rounded-lg bg-white p-3 shadow-sm">
-                      <p className="font-semibold">
-                        Marcus Lee
+                    ) : reviews.length === 0 ? (
+
+                      <p className="text-gray-500">
+                        No reviews yet.
                       </p>
-                      <p className="text-sm text-gray-600">
-                        ★★★★★ Definitely one of my favourite study
-                        spots on campus.
-                      </p>
-                    </div>
+
+                    ) : (
+
+                      reviews.map((review) => (
+
+                        <div
+                          key={review.id}
+                          className="rounded-lg bg-white p-3 shadow-sm"
+                        >
+                          <p className="font-semibold">
+                            {review.profiles?.username}
+                          </p>
+
+                          <p className="text-sm text-gray-600">
+                            {review.content}
+                          </p>
+                        </div>
+
+                      ))
+
+                    )}
 
                   </div>
 
@@ -521,11 +588,14 @@ function Explore() {
 
                     <input
                       type="text"
+                      value={reviewInput}
+                      onChange={(e) => setReviewInput(e.target.value)}
                       placeholder="Leave a review..."
                       className="flex-1 rounded-lg border px-4 py-3"
                     />
 
                     <button
+                      onClick={handlePostReview}
                       className="rounded-lg bg-[#ff9e00] px-5 text-white hover:bg-[#ffb703]"
                     >
                       Post
