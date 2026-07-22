@@ -256,7 +256,7 @@ function Explore() {
 
     const { data, error } = await supabase
       .from("reviews")
-      .select(`id, user_id, content`)
+      .select(`id, content, profiles(display_name)`)
       .eq("studyspot_id", selectedSpot.id)
       .order("id", { ascending: false })
 
@@ -570,7 +570,7 @@ function Explore() {
                           className="rounded-lg bg-white p-3 shadow-sm"
                         >
                           <p className="font-semibold">
-                            {review.profiles?.username}
+                            {review.profiles?.display_name ?? "Anonymous"}
                           </p>
 
                           <p className="text-sm text-gray-600">
