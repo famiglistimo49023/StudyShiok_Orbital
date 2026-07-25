@@ -254,17 +254,17 @@ function Explore() {
 
     setLoadingReviews(true)
 
-    const { data, error } = await supabase
+    const { data, error: reviewError } = await supabase
       .from("reviews")
-      .select(`id, content, profiles(display_name)`)
-      .eq("studyspot_id", selectedSpot.id)
-      .order("id", { ascending: false })
+      .select(`id, content, profiles(display_name)`) //select the rows
+      .eq("studyspot_id", selectedSpot.id) //only the rows pertaining to the selected studyspot
+      .order("id", { ascending: false }) //order by recency
 
-    if (error) {
-      console.error(error)
+    if (reviewError) {
+      console.error(reviewError)
       return
     }
-
+ 
     setReviews(data ?? [])
 
     setLoadingReviews(false)
@@ -272,13 +272,11 @@ function Explore() {
 
   const handlePostReview = async () => {
 
-    if (!selectedSpot) return
-
-    if (reviewInput.trim() === "") return
+    if (!selectedSpot) return //not selected
+    if (reviewInput.trim() === "") return //if theres no review
 
     const { data: auth } = await supabase.auth.getUser()
-
-    if (!auth.user) return
+    if (!auth.user) return //if user isnt authenticated
 
     const { error } = await supabase
       .from("reviews")
@@ -289,11 +287,10 @@ function Explore() {
       })
 
     if (!error) {
-
       setReviewInput("")
       fetchReviews()
-
     }
+
   }
 
 
@@ -469,15 +466,11 @@ function Explore() {
       {/* The modal for the study spot (what is shown when clicked) */}      
       {selectedSpot && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-
           <div className="w-[1100px] rounded-2xl bg-white p-8 shadow-2xl">
-
             <div className="grid grid-cols-2 gap-8">
-
               {/* left side of the modal */}
 
               <div>
-
                   <div className="mb-5 h-64 overflow-hidden rounded-xl border">
                     <StudySpotMap
                       spots={spots}
@@ -536,6 +529,7 @@ function Explore() {
                 <div className="mt-6 flex justify-center">
                   <button
                     className="rounded-lg bg-[#ff9e00] px-8 py-2 font-medium text-white transition hover:bg-[#ffb703]"
+                    onClick={() => navigate('/ReviewSpot', { state: { studySpotId: selectedSpot.id } })}
                   >
                     Review It Yourself
                   </button>

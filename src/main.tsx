@@ -9,6 +9,7 @@ import Explore from './components/Explore'
 import Dashboard from './components/Dashboard'
 import Maps from './components/Maps'
 import Suggest from './components/SuggestSpot'
+import Review from './components/ReviewSpot'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/maps" element={<Maps />} />
         <Route path="/suggest" element={<Suggest />} />
+        <Route path="/ReviewSpot" element={<Review />} />
 
       </Routes>
     </BrowserRouter>
