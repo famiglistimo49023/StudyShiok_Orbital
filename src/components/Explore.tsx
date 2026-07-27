@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 import { supabase } from '../supabase'
 
@@ -49,6 +49,7 @@ function Explore() {
   //without useState, component wont rerender after fetching data, so spots will be empty array and nothing will show up on explore page
 
   const navigate = useNavigate() //the function that allows me to move between webpages
+  const location = useLocation()
 
   const [displayName, setDisplayName] = useState("")
 
@@ -127,6 +128,20 @@ function Explore() {
 
     
   }, [])
+
+  // Auto-open spot modal if navigated from the Dashboard bookmarks
+  useEffect(() => {
+    if (spots.length > 0 && location.state?.openSpotId) {
+      // Find the spot that matches the ID sent from the Dashboard
+      const targetSpot = spots.find((s) => s.id === location.state.openSpotId)
+      
+      if (targetSpot) {
+        setSelectedSpot(targetSpot)
+        // Clean up the URL state so if the user refreshes, the modal doesn't get stuck open
+        window.history.replaceState({}, '')
+      }
+    }
+  }, [spots, location.state])
 
   //depending on the selected spot, modal can show diff info
   const [selectedSpot, setSelectedSpot] = useState<StudySpot | null>(null)

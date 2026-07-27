@@ -172,7 +172,8 @@ setBookmarkedSpots(spots || [])
           return (
             <div
               key={bookmark.studyspot_id}
-              className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg"
+              className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg cursor-pointer"
+              onClick={() => navigate('/explore', { state: { openSpotId: spot?.id } })}
             >
               <h3 className="text-lg font-semibold text-gray-900">
                 {spot?.name}
