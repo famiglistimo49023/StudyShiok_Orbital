@@ -52,7 +52,7 @@ function Explore() {
   const location = useLocation()
 
   const [displayName, setDisplayName] = useState("")
-  // NEW: State to track bookmarked spot IDs
+  // State to track bookmarked spot IDs
   const [bookmarkedSpotIds, setBookmarkedSpotIds] = useState<number[]>([])
 
 
@@ -123,7 +123,7 @@ function Explore() {
         setDisplayName(profileData.display_name)
       }
 
-      // NEW: Fetch user's existing bookmarks so the heart icons load correctly
+      // Fetch user's existing bookmarks so the heart icons load correctly
       const { data: bookmarkData } = await supabase
         .from("bookmarks")
         .select("studyspot_id")
@@ -457,7 +457,7 @@ function Explore() {
                className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg cursor-pointer" 
                onClick={() => openSpot(spot)}>
               
-            {/* NEW: Relative wrapper for the image so the button floats on top */}
+            {/* Relative wrapper for the image so the button floats on top */}
             <div className="relative">
               <img
                 src={spot.images[0] || placeholder}
@@ -465,7 +465,7 @@ function Explore() {
                 className="w-full h-48 object-cover rounded-md"
               />
               
-              {/* NEW: Floating Bookmark Button */}
+              {/* Floating Bookmark Button */}
               <button
                 onClick={(e) => {
                   e.stopPropagation() // <--- This stops the modal from opening when you click the heart!
