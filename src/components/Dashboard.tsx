@@ -20,58 +20,66 @@ const Dashboard: React.FC = () => {
   const fetchData = async () => {
     const { data: userData, error: userError} = await supabase.auth.getUser()
     if (userError || !userData?.user) {
-  console.error("Auth Error:", userError)
-  return
-}
+      console.error("Auth Error:", userError)
+      return
+    }
 
     const userId = userData.user.id
 
-    // bookmarks
+    // 1. Fetch bookmarks
     const { data: bookmarks, error: bookmarksError } = await supabase
       .from('bookmarks')
       .select('studyspot_id')
       .eq('user_id', userId)
-    if (bookmarksError) {
-      console.error("Bookmarks Fetch Error:", bookmarksError.message)
-    }
-    // ratings
+
+    // 2. Fetch ratings
     const { data: ratings, error: ratingsError } = await supabase
       .from('ratings')
       .select('rating')
       .eq('user_id', userId)
 
-    if (ratingsError) {
-      console.error("Ratings Fetch Error:", ratingsError.message)
-    }
-    
-    const { data: spots, error: spotsError } = await supabase
-      .from('bookmarks')
-      .select(`
-        studyspot_id,
-        studyspots (
-        id,
-        name,
-        location,
-        rating,
-        busyness
-      )
-    `)
-  .eq('user_id', userId)
+    // 3. DIRECT FETCH
+    let finalRenderedSpots: any[] = [] // Create a variable to track the actual loaded spots
 
-    if (spotsError) {
-      console.error("Detailed Spots Fetch Error:", spotsError.message)
+    if (bookmarks && bookmarks.length > 0) {
+      const spotIds = bookmarks.map(b => b.studyspot_id)
+      
+      const { data: spotData, error: spotsError } = await supabase
+        .from('studyspots')
+        .select('id, name, location, busyness, ratings(rating)')
+        .in('id', spotIds) 
+
+      if (spotsError) {
+        console.error("Error fetching spots:", {
+        code: spotsError.code,
+        message: spotsError.message,
+        details: spotsError.details,
+        hint: spotsError.hint,
+    })
+  return
+}
+
+      if (spotData) {
+        setBookmarkedSpots(spotData) 
+        
+        // ADD THIS EXACT LINE BELOW:
+        finalRenderedSpots = spotData 
+      }
+    } else {
+      setBookmarkedSpots([])
     }
-setBookmarkedSpots(spots || [])
+
+    // 4. Update Stats
     const avg =
       ratings && ratings.length > 0
         ? ratings.reduce((a, b) => a + b.rating, 0) / ratings.length
         : 0
 
     setStats({
-      bookmarkedCount: bookmarks?.length || 0,
+      bookmarkedCount: finalRenderedSpots.length, // <-- FIX: Now it only counts valid cards!
       ratingsGiven: ratings?.length || 0,
       avgRating: Number(avg.toFixed(1)),
-      notBusySpots: 0 // keep placeholder for now
+      notBusySpots: 0 
     })
   }
 
@@ -166,30 +174,31 @@ setBookmarkedSpots(spots || [])
       </h2>
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {bookmarkedSpots.map((bookmark) => {
-          const spot = bookmark.studyspots
+        {/* We map 'spot' directly now! */}
+        {bookmarkedSpots.map((spot) => {
+          if (!spot) return null
 
           return (
             <div
-              key={bookmark.studyspot_id}
+              key={spot.id}
               className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg cursor-pointer"
-              onClick={() => navigate('/explore', { state: { openSpotId: spot?.id } })}
+              onClick={() => navigate('/explore', { state: { openSpotId: spot.id } })}
             >
               <h3 className="text-lg font-semibold text-gray-900">
-                {spot?.name}
+                {spot.name}
               </h3>
 
               <p className="mt-1 text-gray-600">
-                {spot?.location}
+                {spot.location}
               </p>
 
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-sm text-gray-700">
-                  <b>Rating:</b> {spot?.rating} / 5
+                  <b>Rating:</b> {spot.rating} / 5
                 </span>
 
                 <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
-                  {spot?.busyness}
+                  {spot.busyness}
                 </span>
               </div>
             </div>

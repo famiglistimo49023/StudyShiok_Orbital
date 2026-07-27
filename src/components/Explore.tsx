@@ -52,7 +52,8 @@ function Explore() {
   const location = useLocation()
 
   const [displayName, setDisplayName] = useState("")
-
+  // NEW: State to track bookmarked spot IDs
+  const [bookmarkedSpotIds, setBookmarkedSpotIds] = useState<number[]>([])
 
 
 
@@ -107,24 +108,34 @@ function Explore() {
     fetchSpots()
 
 
-    const fetchUser = async () => {
-
+    const fetchUserAndBookmarks = async () => {
       const { data: authData } = await supabase.auth.getUser()
-
       if (!authData.user) return
 
-      const { data } = await supabase
+      // Fetch user profile name
+      const { data: profileData } = await supabase
         .from("profiles")
         .select("display_name")
         .eq("id", authData.user.id)
         .single()
 
-      if (data) {
-        setDisplayName(data.display_name)
+      if (profileData) {
+        setDisplayName(profileData.display_name)
+      }
+
+      // NEW: Fetch user's existing bookmarks so the heart icons load correctly
+      const { data: bookmarkData } = await supabase
+        .from("bookmarks")
+        .select("studyspot_id")
+        .eq("user_id", authData.user.id)
+
+      if (bookmarkData) {
+        setBookmarkedSpotIds(bookmarkData.map((b) => b.studyspot_id))
       }
     }
 
-    fetchUser()
+    // Call the new combined function
+    fetchUserAndBookmarks()
 
     
   }, [])
@@ -284,7 +295,37 @@ function Explore() {
 
     setLoadingReviews(false)
   }
+  // The logic to add or delete a bookmark in Supabase
+  const handleToggleBookmark = async (spotId: number) => {
+    const { data: auth } = await supabase.auth.getUser()
+    if (!auth.user) return
 
+    const isBookmarked = bookmarkedSpotIds.includes(spotId)
+
+    if (isBookmarked) {
+      // If it's already bookmarked, REMOVE it from Supabase
+      const { error } = await supabase
+        .from('bookmarks')
+        .delete()
+        .eq('user_id', auth.user.id)
+        .eq('studyspot_id', spotId)
+
+      if (!error) {
+        // Remove it from our local React state instantly
+        setBookmarkedSpotIds((prev) => prev.filter((id) => id !== spotId))
+      }
+    } else {
+      // If it's not bookmarked, ADD it to Supabase
+      const { error } = await supabase
+        .from('bookmarks')
+        .insert({ user_id: auth.user.id, studyspot_id: spotId })
+
+      if (!error) {
+        // Add it to our local React state instantly
+        setBookmarkedSpotIds((prev) => [...prev, spotId])
+      }
+    }
+  }
   const handlePostReview = async () => {
 
     if (!selectedSpot) return //not selected
@@ -416,11 +457,27 @@ function Explore() {
                className="rounded-xl bg-white p-5 shadow-md transition hover:shadow-lg cursor-pointer" 
                onClick={() => openSpot(spot)}>
               
-            <img
-              src={spot.images[0] || placeholder}
-              alt={spot.name}
-              className="w-full h-48 object-cover"
-            />
+            {/* NEW: Relative wrapper for the image so the button floats on top */}
+            <div className="relative">
+              <img
+                src={spot.images[0] || placeholder}
+                alt={spot.name}
+                className="w-full h-48 object-cover rounded-md"
+              />
+              
+              {/* NEW: Floating Bookmark Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation() // <--- This stops the modal from opening when you click the heart!
+                  handleToggleBookmark(spot.id)
+                }}
+                className={`absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-2xl shadow-sm transition hover:scale-110 hover:bg-white ${
+                  bookmarkedSpotIds.includes(spot.id) ? 'text-red-500' : 'text-gray-400'
+                }`}
+              >
+                {bookmarkedSpotIds.includes(spot.id) ? '♥' : '♡'}
+              </button>
+            </div>
 
 
             {/* <div className="p-4"> */}
