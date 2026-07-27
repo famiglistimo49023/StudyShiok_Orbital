@@ -32,11 +32,31 @@ const Dashboard: React.FC = () => {
       .select('studyspot_id')
       .eq('user_id', userId)
 
+    if (bookmarksError) {
+      console.error("Error fetching bookmarks:", {
+        code: bookmarksError.code,
+        message: bookmarksError.message,
+        details: bookmarksError.details,
+        hint: bookmarksError.hint,
+      })
+      return
+    }
+
     // 2. Fetch ratings
     const { data: ratings, error: ratingsError } = await supabase
       .from('ratings')
       .select('rating')
       .eq('user_id', userId)
+
+    if (ratingsError) {
+      console.error("Error fetching ratings:", {
+        code: ratingsError.code,
+        message: ratingsError.message,
+        details: ratingsError.details,
+        hint: ratingsError.hint,
+      })
+      return
+    }
 
     // 3. DIRECT FETCH
     let finalRenderedSpots: any[] = [] // Create a variable to track the actual loaded spots
